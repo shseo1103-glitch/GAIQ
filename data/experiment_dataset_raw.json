@@ -1,0 +1,747 @@
+{
+  "metadata": {
+    "project": "GAIQ (Graphene AI-QC) - 그래핀일렉트릭 실험데이터셋",
+    "generated_at": "2026-09-07",
+    "source_directory": "/home/work/.openclaw/workspace/upload/",
+    "note": "각 row는 1개 실험/배치/시험 케이스. 결측치는 null. 단위는 unit 필드에 명시.",
+    "total_rows": 42
+  },
+  "experiments": [
+    {
+      "row_id": 1,
+      "source_file": "그래핀 구리 와이어 실험 보고_24.01.19 (그래핀스퀘어케미칼) (3).pptx",
+      "experiment_date": "2024-01-19",
+      "process": {
+        "synthesis_method": null,
+        "temperature_C": null,
+        "pressure": null,
+        "gas_flow": null,
+        "reaction_time_min": null,
+        "substrate": "Cu wire 50um",
+        "other_conditions": "As-grown graphene (합성조건 미기재), 4-probe measurement, Ag 전극, 측정길이 4cm"
+      },
+      "measured_properties": {
+        "resistivity_change_pct": -20,
+        "resistivity_change_pct_unit": "% (Bare 대비 As-grown 비저항 변화, 50um)",
+        "raman_ID_IG": null,
+        "raman_I2D_IG": null,
+        "coverage_pct": null,
+        "conductivity_improvement_pct": null,
+        "IACS_pct": null,
+        "tensile_strength": null,
+        "resistance": null,
+        "temp_rise_C": null,
+        "weight": null
+      },
+      "verdict": "양품(성능개선)",
+      "notes": "50um 와이어 그래핀 합성 후 비저항 20% 감소. 정확 수치는 그래프 이미지 추정치."
+    },
+    {
+      "row_id": 2,
+      "source_file": "그래핀 구리 와이어 실험 보고_24.01.19 (그래핀스퀘어케미칼) (3).pptx",
+      "experiment_date": "2024-01-19",
+      "process": {
+        "synthesis_method": null,
+        "temperature_C": null,
+        "pressure": null,
+        "gas_flow": null,
+        "reaction_time_min": null,
+        "substrate": "Cu wire 80um",
+        "other_conditions": "As-grown graphene, 4-probe measurement, Ag 전극, 측정길이 4cm"
+      },
+      "measured_properties": {
+        "resistivity_change_pct": -11,
+        "resistivity_change_pct_unit": "% (Bare 대비 As-grown 비저항 변화, 80um)",
+        "raman_ID_IG": null,
+        "raman_I2D_IG": null,
+        "coverage_pct": null,
+        "conductivity_improvement_pct": null,
+        "IACS_pct": null,
+        "tensile_strength": null,
+        "resistance": null,
+        "temp_rise_C": null,
+        "weight": null
+      },
+      "verdict": "양품(성능개선)",
+      "notes": "80um 와이어 그래핀 합성 후 비저항 11% 감소. 50um보다 개선폭 작음."
+    },
+    {
+      "row_id": 3,
+      "source_file": "그래핀 구리 와이어 실험 보고_24.01.19 (그래핀스퀘어케미칼) (3).pptx",
+      "experiment_date": "2024-01-19",
+      "process": {
+        "synthesis_method": null,
+        "temperature_C": null,
+        "pressure": null,
+        "gas_flow": null,
+        "reaction_time_min": null,
+        "substrate": "Cu wire 50um, Bare",
+        "other_conditions": "산화조건: 300도 hot plate 24시간 가열 + 실온 쿨링"
+      },
+      "measured_properties": {
+        "resistivity_change_pct": null,
+        "note": "산화 후 비저항 감소(정확수치 미기재), Y축 범위 0~1E-7 Ohm*m"
+      },
+      "verdict": "판정보류(Raman 검증필요)",
+      "notes": "Bare Cu는 산화 후 비저항 감소 - 미산화 또는 열처리효과 추정"
+    },
+    {
+      "row_id": 4,
+      "source_file": "그래핀 구리 와이어 실험 보고_24.01.19 (그래핀스퀘어케미칼) (3).pptx",
+      "experiment_date": "2024-01-19",
+      "process": {
+        "synthesis_method": null,
+        "substrate": "Cu wire 50um, As-grown"
+      },
+      "measured_properties": {
+        "note": "산화 전후 변화폭이 Bare 대비 더 작음 (그래핀 보호효과 시사), Y축 범위 0~7E-8 Ohm*m"
+      },
+      "verdict": "그래핀 산화방지효과 추정",
+      "notes": "Raman 산화peak 검증 예정"
+    },
+    {
+      "row_id": 5,
+      "source_file": "그래핀 구리 와이어 실험 보고_23.12.01 (그래핀스퀘어케미칼) (2).pptx",
+      "experiment_date": "2023-12-01",
+      "process": {
+        "synthesis_method": "Thermal CVD",
+        "temperature_C": 1000,
+        "pressure": null,
+        "gas_flow": "H2 10sccm, CH4 200sccm",
+        "reaction_time_min": "Anneal 90 + Growth 60",
+        "substrate": "구리 연동선 50um (Cu Wet Etching APS 병행)",
+        "other_conditions": "쿼츠 튜브 내 전선 삽입, SiO2 기판 위 transfer 후 OM/Raman 관찰"
+      },
+      "measured_properties": {
+        "raman_ID_IG": null,
+        "raman_I2D_IG": 0.61,
+        "sample_label": "Sample 3_1"
+      },
+      "verdict": "판정근거 부족(정량값 없음)",
+      "notes": "D,G,2D 피크는 그래프상 위치 추정(D~1350,G~1580,2D~2700 cm-1)"
+    },
+    {
+      "row_id": 6,
+      "source_file": "그래핀 구리 와이어 실험 보고_23.12.01 (그래핀스퀘어케미칼) (2).pptx",
+      "experiment_date": "2023-12-01",
+      "process": {
+        "synthesis_method": "Thermal CVD",
+        "temperature_C": 1000,
+        "gas_flow": "H2 10sccm, CH4 200sccm",
+        "reaction_time_min": "Anneal 90 + Growth 60",
+        "substrate": "구리 연동선 50um"
+      },
+      "measured_properties": {
+        "raman_I2D_IG": 3.18,
+        "sample_label": "Sample 3_2"
+      },
+      "verdict": "양품(다층 고품질 그래핀 추정)",
+      "notes": "I2D/IG=3.18은 단층 그래핀 가능성 시사(일반적으로 I2D/IG>2). OM상 다층 그래핀 관찰 서술과 다소 상충."
+    },
+    {
+      "row_id": 7,
+      "source_file": "240809_과제 추가용 데이터 (1).pptx",
+      "experiment_date": null,
+      "process": {
+        "synthesis_method": "CVD",
+        "substrate": "Cu wire",
+        "other_conditions": "Raman laser point 20um, 측정범위 1000-3200cm-1"
+      },
+      "measured_properties": {
+        "raman_ID_IG": 0.11,
+        "raman_I2D_IG": 3.18,
+        "unit_note": "무차원 비율"
+      },
+      "verdict": "양품(1단계 목표 D/G<=0.2 충족, 2단계 목표 0.1 근접충족)",
+      "notes": "시료명: Graphene on Cu wire"
+    },
+    {
+      "row_id": 8,
+      "source_file": "240809_과제 추가용 데이터 (1).pptx",
+      "experiment_date": null,
+      "process": {
+        "substrate": "Bare Cu wire vs Graphene-coated Cu wire"
+      },
+      "measured_properties": {
+        "thickness_bare_um": 50.8,
+        "thickness_graphene_um": 49.6,
+        "thickness_change_pct": 2.3
+      },
+      "verdict": "1단계 목표(5%이하) 충족, 2단계 목표(2%이하) 근소미충족",
+      "notes": "그래핀 코팅 후 두께 감소(측정오차 가능성 있음)"
+    },
+    {
+      "row_id": 9,
+      "source_file": "240809_과제 추가용 데이터 (1).pptx",
+      "experiment_date": null,
+      "process": {
+        "other_conditions": "산화조건: 100도 핫플레이트 24시간 가열"
+      },
+      "measured_properties": {
+        "CuO_peak_position_cm-1": [300, 630],
+        "intensity_change_pct": null
+      },
+      "verdict": "산화억제 확인(정성적, 정량값 없음)",
+      "notes": "Bare Cu는 산화후 뚜렷한 CuO peak, Graphene Cu는 변화 적음"
+    },
+    {
+      "row_id": 10,
+      "source_file": "2024-7-30_ GSC 그래핀 구리 전선 시험성적 결과.pptx",
+      "experiment_date": "2024-07-30",
+      "process": {
+        "synthesis_method": "CVD",
+        "temperature_C": 1000,
+        "gas_flow_set1": "H2 5sccm, CH4 80sccm",
+        "gas_flow_set2": "H2 5sccm, CH4 100sccm",
+        "gas_flow_set3": "H2 10sccm, CH4 100sccm",
+        "gas_flow_set4": "H2 10sccm, CH4 200sccm",
+        "gas_flow_set5": "H2 10sccm, CH4 200sccm",
+        "reaction_time_min": "Anneal 90(all sets), Growth 30(set1-4)/60(set5)",
+        "substrate": "Cu wire 50/80um"
+      },
+      "measured_properties": {
+        "note": "5-set CVD 합성조건 실험설계표. 실측 결과는 이후 슬라이드 참조"
+      },
+      "verdict": "실험설계단계",
+      "notes": "Set5(CH4최대유량) 결과가 그래핀 합성유무 판단 핵심"
+    },
+    {
+      "row_id": 11,
+      "source_file": "2024-7-30_ GSC 그래핀 구리 전선 시험성적 결과.pptx",
+      "experiment_date": "2024-07-30",
+      "process": {"substrate": "Cu wire 50um"},
+      "measured_properties": {
+        "diameter_bare_um": 50.2,
+        "diameter_graphene_um": 49.6,
+        "diameter_change_pct": -1.2
+      },
+      "verdict": "직경 감소 확인",
+      "notes": "그래핀 합성으로 인한 미세 식각/재배열 추정 (SEM 측정)"
+    },
+    {
+      "row_id": 12,
+      "source_file": "2024-7-30_ GSC 그래핀 구리 전선 시험성적 결과.pptx",
+      "experiment_date": "2024-07-30",
+      "process": {"substrate": "Cu wire 50um", "other_conditions": "4-point 측정, Bare/Anneal/Graphene 비교"},
+      "measured_properties": {
+        "resistance_change_pct_anneal": 27.48,
+        "resistance_change_pct_graphene": -18.50,
+        "conductivity_change_pct_anneal": -22.56,
+        "conductivity_change_pct_graphene": 22.74
+      },
+      "verdict": "Graphene 샘플 전기특성 개선(양호), Annealing 저항증가(불리)",
+      "notes": "Annealing 저항증가는 grain boundary 영향 추정"
+    },
+    {
+      "row_id": 13,
+      "source_file": "2024-7-30_ GSC 그래핀 구리 전선 시험성적 결과.pptx",
+      "experiment_date": "2024-07-30",
+      "process": {"substrate": "Cu wire 80um"},
+      "measured_properties": {
+        "diameter_bare_um": 80.7,
+        "diameter_graphene_um": 77.2,
+        "diameter_change_pct": -4.3
+      },
+      "verdict": "직경 감소 확인 (Annealing/합성 모두)",
+      "notes": null
+    },
+    {
+      "row_id": 14,
+      "source_file": "2024-7-30_ GSC 그래핀 구리 전선 시험성적 결과.pptx",
+      "experiment_date": "2024-07-30",
+      "process": {"substrate": "Cu wire 80.7um", "other_conditions": "4-point, Bare/Anneal/Graphene 비교"},
+      "measured_properties": {
+        "resistance_change_pct_anneal": -1.30,
+        "resistance_change_pct_graphene": -6.06,
+        "conductivity_change_pct_anneal": 6.88,
+        "conductivity_change_pct_graphene": 11.16
+      },
+      "verdict": "Annealing 결정재배열 효과, Graphene 효과 50um 대비 감소",
+      "notes": null
+    },
+    {
+      "row_id": 15,
+      "source_file": "2024-7-30_ GSC 그래핀 구리 전선 시험성적 결과.pptx",
+      "experiment_date": "2024-07-30",
+      "process": {"substrate": "Cu wire 50um/80um, Bare vs As-grown", "other_conditions": "4-point 측정"},
+      "measured_properties": {
+        "resistivity_change_pct_50um": -20,
+        "resistivity_change_pct_80um": -11
+      },
+      "verdict": "양품(전기적 성능 개선)",
+      "notes": "얇을수록 개선폭 큼. 참고논문(Kashani)과 경향 일치. row1,2와 동일 데이터의 다른 슬라이드 표현"
+    },
+    {
+      "row_id": 16,
+      "source_file": "2024-7-30_ GSC 그래핀 구리 전선 시험성적 결과.pptx",
+      "experiment_date": "2024-07-30",
+      "process": {"other_conditions": "산화조건: 100도 핫플레이트 1일 가열"},
+      "measured_properties": {
+        "CuO_peak_cm-1": [300, 630],
+        "note": "동일파워/노출시간에도 peak 위치 불일치"
+      },
+      "verdict": "정량비교 어려움, 추가정밀 Raman 재측정 필요",
+      "notes": null
+    },
+    {
+      "row_id": 17,
+      "source_file": "2024-7-30_ GSC 그래핀 구리 전선 시험성적 결과.pptx",
+      "experiment_date": "2024-07-30",
+      "process": {"other_conditions": "산화조건: 300도 24시간+실온쿨링, 50um/80um Bare/As-grown"},
+      "measured_properties": {
+        "resistivity_range_50um_asgrown_ohm_m": "0~7E-8",
+        "resistivity_range_50um_bare_ohm_m": "0~1E-7",
+        "resistivity_range_80um_ohm_m": "0~2E-7"
+      },
+      "verdict": "As-grown이 Bare 대비 변화폭 작음(산화영향 덜받음 추정)",
+      "notes": "저항 감소는 산화미발생+열처리효과 복합가능성"
+    },
+    {
+      "row_id": 18,
+      "source_file": "2024-7-30_ GSC 그래핀 구리 전선 시험성적 결과.pptx",
+      "experiment_date": "2024-07-30",
+      "process": {"other_conditions": "DC 전류 인가 0.01/0.02/0.03/0.04A, 5개 샘플(S1-S5)"},
+      "measured_properties": {
+        "S1_resistivity_ohm_m": [6.00e-8, 6.12e-8, 6.16e-8, 6.19e-8],
+        "S2_resistivity_ohm_m": [8.45e-8, 8.63e-8, 8.69e-8, 8.73e-8],
+        "S3_resistivity_ohm_m": [6.82e-8, 6.96e-8, 7.01e-8, 7.04e-8],
+        "S4_resistivity_ohm_m": [1.03e-7, 1.04e-7, 1.05e-7, 1.05e-7],
+        "S5_resistivity_ohm_m": [7.84e-8, 8.00e-8, 8.04e-8, 8.06e-8]
+      },
+      "verdict": "전류증가에 따라 비저항 소폭 증가(Joule heating 추정)",
+      "notes": "0.01->0.02A 구간 변화율이 가장 큼(1.81~2.14%)"
+    },
+    {
+      "row_id": 19,
+      "source_file": "2024-7-30_ GSC 그래핀 구리 전선 시험성적 결과.pptx",
+      "experiment_date": "2024-07-30",
+      "process": {
+        "substrate": "50um 연선(strand)",
+        "anneal_condition": "1000C 1h(H2 10sccm)+30min(H2 10sccm+Ar 100sccm)",
+        "graphene_condition": "1000C 1h(H2 10sccm)+30min(H2 10sccm+Ar 100sccm)+1h(H2 10sccm+Ar 100sccm+CH4 200sccm)"
+      },
+      "measured_properties": {
+        "diameter_bare_um": [280, 243],
+        "diameter_anneal_um": [246, 278, 50.1, 51.2],
+        "diameter_graphene_um": [47.1, 49.46]
+      },
+      "verdict": "Bare는 일부 unwound구간 존재, Anneal/Graphene 두께 유사",
+      "notes": "SEM 직경측정, 연선(strand) 형태 실험"
+    },
+    {
+      "row_id": 20,
+      "source_file": "211115_그래핀부스바 검증시험 결과서 (3).pptx",
+      "experiment_date": "2021-11-09~11",
+      "process": {
+        "substrate": "부스바 80SQ (일반 vs 단층그래핀)",
+        "other_conditions": "750Vdc, 100Adc(50% of 200A rated), 1시간연속운전, 데스틴파워 나주공장"
+      },
+      "measured_properties": {
+        "temp_rise_C_general_contact": 2.86,
+        "temp_rise_C_graphene_contact": 2.19,
+        "temp_rise_C_general_IR": 2.01,
+        "temp_rise_C_graphene_IR": 2.02,
+        "temp_diff_C": -0.67
+      },
+      "verdict": "양호(1도 미만 차이)",
+      "notes": null
+    },
+    {
+      "row_id": 21,
+      "source_file": "211115_그래핀부스바 검증시험 결과서 (3).pptx",
+      "experiment_date": "2021-11-09~11",
+      "process": {"substrate": "부스바 80SQ (일반 vs 다층그래핀)", "other_conditions": "750Vdc, 100Adc, 1시간"},
+      "measured_properties": {
+        "temp_rise_C_general_contact": 3.15,
+        "temp_rise_C_graphene_contact": 2.41,
+        "temp_rise_C_general_IR": 2.99,
+        "temp_rise_C_graphene_IR": 2.51,
+        "temp_diff_C": -0.74
+      },
+      "verdict": "양호",
+      "notes": null
+    },
+    {
+      "row_id": 22,
+      "source_file": "211115_그래핀부스바 검증시험 결과서 (3).pptx",
+      "experiment_date": "2021-11-09~11",
+      "process": {"substrate": "부스바 80SQ (단층그래핀)", "other_conditions": "750Vdc, 200Adc(100%), 1시간"},
+      "measured_properties": {
+        "temp_rise_C_general_contact": 12.93,
+        "temp_rise_C_graphene_contact": 11.06,
+        "temp_rise_C_general_IR": 14.39,
+        "temp_rise_C_graphene_IR": 12.10,
+        "temp_diff_C": -1.87
+      },
+      "verdict": "양호(약2도 낮음)",
+      "notes": null
+    },
+    {
+      "row_id": 23,
+      "source_file": "211115_그래핀부스바 검증시험 결과서 (3).pptx",
+      "experiment_date": "2021-11-09~11",
+      "process": {"substrate": "부스바 80SQ (다층그래핀)", "other_conditions": "750Vdc, 200Adc, 1시간"},
+      "measured_properties": {
+        "temp_rise_C_general_contact": 12.70,
+        "temp_rise_C_graphene_contact": 10.23,
+        "temp_rise_C_general_IR": 13.28,
+        "temp_rise_C_graphene_IR": 11.31,
+        "temp_diff_C": -2.47
+      },
+      "verdict": "양호(약2도 낮음)",
+      "notes": null
+    },
+    {
+      "row_id": 24,
+      "source_file": "211115_그래핀부스바 검증시험 결과서 (3).pptx",
+      "experiment_date": "2021-11-09~11",
+      "process": {"substrate": "부스바 80SQ (단층그래핀)", "other_conditions": "750Vdc, 300Adc(150%), 1시간"},
+      "measured_properties": {
+        "temp_rise_C_general_contact": 27.59,
+        "temp_rise_C_graphene_contact": 24.83,
+        "temp_rise_C_general_IR": 31.16,
+        "temp_rise_C_graphene_IR": 27.65,
+        "temp_diff_C": -3.51
+      },
+      "verdict": "양호(약5도 낮음)",
+      "notes": null
+    },
+    {
+      "row_id": 25,
+      "source_file": "211115_그래핀부스바 검증시험 결과서 (3).pptx",
+      "experiment_date": "2021-11-09~11",
+      "process": {"substrate": "부스바 80SQ (다층그래핀)", "other_conditions": "750Vdc, 300Adc, 1시간"},
+      "measured_properties": {
+        "temp_rise_C_general_contact": 29.28,
+        "temp_rise_C_graphene_contact": 23.34,
+        "temp_rise_C_general_IR": 32.33,
+        "temp_rise_C_graphene_IR": 27.74,
+        "temp_diff_C": -5.94
+      },
+      "verdict": "양호(약5도 낮음, 최대개선폭)",
+      "notes": "80SQ/300A 조건이 그래핀 효과 최대"
+    },
+    {
+      "row_id": 26,
+      "source_file": "211115_그래핀부스바 검증시험 결과서 (3).pptx",
+      "experiment_date": "2021-11-09~11",
+      "process": {"substrate": "부스바 20SQ (단층/다층그래핀)", "other_conditions": "750Vdc, 25Adc(50% of 50A rated), 1시간"},
+      "measured_properties": {
+        "temp_rise_C_single_general": 1.08,
+        "temp_rise_C_single_graphene": 0.99,
+        "temp_rise_C_multi_general": 1.10,
+        "temp_rise_C_multi_graphene": 1.01
+      },
+      "verdict": "차이없음",
+      "notes": "저용량 규격에서 그래핀 효과 미미"
+    },
+    {
+      "row_id": 27,
+      "source_file": "211115_그래핀부스바 검증시험 결과서 (3).pptx",
+      "experiment_date": "2021-11-09~11",
+      "process": {"substrate": "부스바 20SQ", "other_conditions": "750Vdc, 50Adc(100%), 1시간"},
+      "measured_properties": {
+        "temp_rise_C_single_general": 3.43,
+        "temp_rise_C_single_graphene": 3.35,
+        "temp_rise_C_multi_general": 3.65,
+        "temp_rise_C_multi_graphene": 3.53
+      },
+      "verdict": "차이없음",
+      "notes": null
+    },
+    {
+      "row_id": 28,
+      "source_file": "211115_그래핀부스바 검증시험 결과서 (3).pptx",
+      "experiment_date": "2021-11-09~11",
+      "process": {"substrate": "부스바 20SQ", "other_conditions": "750Vdc, 75Adc(150%), 1시간"},
+      "measured_properties": {
+        "temp_rise_C_single_general": 7.78,
+        "temp_rise_C_single_graphene": 7.15,
+        "temp_rise_C_multi_general": 7.81,
+        "temp_rise_C_multi_graphene": 7.28
+      },
+      "verdict": "양호(1도 미만 낮음)",
+      "notes": "단층/다층 온도차 전조건 1도 미만으로 유의차 없음"
+    },
+    {
+      "row_id": 29,
+      "source_file": "성능평가보고서_열사병응급키트_바이오그래핀(주)_2023.10.18.pdf",
+      "experiment_date": "2023-10-18",
+      "process": {
+        "material": "냉각시트 - 폴리에스터100%+Graphene Oxide 코팅",
+        "size": "90cmx150cm(3매), 시트10x10cm",
+        "test_condition": "핫플레이트 40C, 쿨스프레이+부채질"
+      },
+      "measured_properties": {
+        "temp_diff_C_1min": 1.6, "temp_diff_C_3min": 3.2, "temp_diff_C_5min": 3.3, "temp_diff_C_10min": 2.9
+      },
+      "verdict": "Pass(GO시트가 CON보다 저온유지)",
+      "notes": "원문 일부 표기 오타 추정(3.2->32 등)"
+    },
+    {
+      "row_id": 30,
+      "source_file": "성능평가보고서_열사병응급키트_바이오그래핀(주)_2023.10.18.pdf",
+      "experiment_date": "2023-10-18",
+      "process": {"test_condition": "핫플레이트 50C"},
+      "measured_properties": {
+        "temp_diff_C_1min": 5.4, "temp_diff_C_2min": 1.7, "temp_diff_C_3min": 0.5, "temp_diff_C_5min": 1.1
+      },
+      "verdict": "Pass",
+      "notes": null
+    },
+    {
+      "row_id": 31,
+      "source_file": "성능평가보고서_열사병응급키트_바이오그래핀(주)_2023.10.18.pdf",
+      "experiment_date": "2023-10-18",
+      "process": {"test_condition": "핫플레이트 60C"},
+      "measured_properties": {
+        "temp_diff_C_1min": 10.6, "temp_diff_C_2min": 3.1, "temp_diff_C_3min": 8.3, "temp_diff_C_4min": 2.1
+      },
+      "verdict": "Pass",
+      "notes": null
+    },
+    {
+      "row_id": 32,
+      "source_file": "성능평가보고서_열사병응급키트_바이오그래핀(주)_2023.10.18.pdf",
+      "experiment_date": "2023-10-18",
+      "process": {"test_condition": "운동 후 체온변화(런닝머신, 직장온도 38.5C 도달까지 운동)"},
+      "measured_properties": {
+        "min_Tsk_C_control": "36.8+-0.0",
+        "min_Tsk_C_general_sheet": "36.5+-0.2",
+        "min_Tsk_C_graphene_sheet": "36.2+-0.4",
+        "delta_Tsk_C_control": "0.09+-0.17",
+        "delta_Tsk_C_general_sheet": "0.90+-0.19",
+        "delta_Tsk_C_graphene_sheet": "0.95+-0.10",
+        "p_value": "<0.001 (delta_Tsk), <0.05 (min_Tsk)"
+      },
+      "verdict": "Pass(그래핀 그룹 최대 냉각효과, 대조군대비 0.86~0.9C 추가냉각)",
+      "notes": "통계적유의차 확인. 아이스박스 대신 20C 물 사용, 쿨스프레이/부채 부수활동 미실시로 실사용시 더 우수할것으로 예상"
+    },
+    {
+      "row_id": 33,
+      "source_file": "[콤보1타입] 충전케이블 REV-1C-150C-UL Test Report.pdf",
+      "experiment_date": null,
+      "process": {
+        "product": "REV-1C-150C EV connector",
+        "standard": "IEC 62196-1/-3 (2014-06), UL LLC 시험"
+      },
+      "measured_properties": {
+        "rated_current_A": 150,
+        "rated_voltage_Vdc": 600,
+        "signal_current_A": 2,
+        "signal_voltage_Vdc": 30,
+        "insulation_resistance_MOhm": ">=5",
+        "dielectric_test_Vac": 1700,
+        "cable_weight_kg": 2.41,
+        "connector_weight_kg": 1.00,
+        "pull_force_N": 3.62,
+        "insertion_force_N": [62.27, 84.52, 75.62],
+        "cable_pull_force_N": 250,
+        "torque_Nm": 2.3,
+        "IP_rating": "IP44(결합)/IP24(미결합)",
+        "aging_test": "80C 240h, 균열없음",
+        "humidity_test": "93% 32C 168h, 손상없음",
+        "flexing_force_N": 75
+      },
+      "verdict": "Pass(전항목, IEC62196-1/-3 적합)",
+      "notes": "AWG/SQ 도체단면적, 온도상승 실측수치는 Attachment3(104p)에 별도, 본문에 미기재"
+    },
+    {
+      "row_id": 34,
+      "source_file": "[콤보1타입] 충전케이블 REV-1C-150C Datasheet.pdf",
+      "experiment_date": "2016-04-18 (issue date)",
+      "process": {
+        "product": "REV-1C-150c (REMA SAE J1772 DC Level2 connector)",
+        "standard": "UL2251 Ed3(2013), UL62, SAE J1772(2013), IEC62196-1/3"
+      },
+      "measured_properties": {
+        "rated_voltage_power_Vdc": 600,
+        "rated_current_power_A": 150,
+        "rated_voltage_signal_V": 30,
+        "rated_current_signal_A": 2,
+        "ambient_temp_range_C": "-30 to +50",
+        "temp_rise_limit_C": "50 (150A 90min 통전시)",
+        "connector_weight_kg": 2.2,
+        "connector_dimension_mm": "76x305x202",
+        "power_conductor_AWG": 2,
+        "signal_conductor_AWG": 16,
+        "ground_conductor_AWG": 6,
+        "power_conductor_diameter_mm": 7.67,
+        "insulation_material": "EPDM",
+        "insulation_thickness_power_mm": 2.03,
+        "jacket_material": "CPE",
+        "cable_OD_max_mm": 32.0,
+        "cable_weight_lbs_per_mft": 1000,
+        "contact_resistance_target_uOhm": 80,
+        "kelvin_resistance_range_Ohm": "0.001-10",
+        "insulation_resistance_range_MOhm": "5-1000",
+        "high_voltage_test_VDC": 2000,
+        "high_voltage_test_VAC": 1000,
+        "push_pull_force_lbs": "CP/CS 30, Gnd 100, DC+/- 180"
+      },
+      "verdict": "규격적합(UL/CSA/SAE/IEC)",
+      "notes": "Type EV 케이블, IP44/Type3R, 굴곡반경 케이블직경의 4배이상 권고"
+    },
+    {
+      "row_id": 35,
+      "source_file": "2025년 창업중심대학 최종보고서_(주)그래핀일렉트릭.pdf",
+      "experiment_date": "2025",
+      "process": {
+        "synthesis_method": "CVD",
+        "temperature_C": ">=1000",
+        "gas": "CH4",
+        "substrate": "Cu foil catalyst",
+        "wire_spec": "0.08mm x ~1990 strand, 약 7SQ"
+      },
+      "measured_properties": {
+        "raman_ID_IG": "<=0.1",
+        "raman_measurement_points": 5,
+        "raman_scan_range_cm-1": "1000-3000"
+      },
+      "verdict": "Pass(양품, 결함 낮음)",
+      "notes": "D' peak 미관찰"
+    },
+    {
+      "row_id": 36,
+      "source_file": "2025년 창업중심대학 최종보고서_(주)그래핀일렉트릭.pdf",
+      "experiment_date": "2025",
+      "process": {
+        "test_condition": "220V 60Hz 32A 7kW 1시간, KC 61851-1:2022 기준, 주위온도 18C",
+        "product": "7kW 이동형 충전기 시제품"
+      },
+      "measured_properties": {
+        "temp_C_internal_wiring_L_test": 26, "temp_C_internal_wiring_L_control": 28,
+        "temp_C_internal_wiring_N_test": 26, "temp_C_internal_wiring_N_control": 28,
+        "temp_C_cable_test": 21, "temp_C_cable_control": 27,
+        "temp_C_connector_test": 28, "temp_C_connector_control": 26,
+        "temp_reduction_pct_cable": 22.2,
+        "cable_diameter_mm_test": 5.3, "cable_diameter_mm_control": 5.6,
+        "cable_cross_section_mm2_test": 21.9, "cable_cross_section_mm2_control": 24.4,
+        "weight_reduction_pct": 10.2,
+        "insulation_resistance_GOhm_L_N_PE": 950,
+        "insulation_resistance_GOhm_L_N_CP_test": 950, "insulation_resistance_GOhm_L_N_CP_control": 249,
+        "insulation_resistance_improvement_pct": 281,
+        "dielectric_test_V_LN_PE": 1420, "dielectric_test_V_LN_CP": 2840,
+        "CP_voltage_V_stateA": 12.2, "CP_voltage_V_stateB": 8.8, "CP_voltage_V_stateC": 5.4
+      },
+      "verdict": "Pass(목표달성도 100%, 시제품 개발완료)",
+      "notes": "실제 완제품 충전기 시험데이터 - 매우 신뢰도 높은 실측치. 온도22.2%감소/절연저항281%향상/경량화10.2% 종합성과"
+    },
+    {
+      "row_id": 37,
+      "source_file": "2021-11-18_ GSQ 그래핀 구리 전선.pptx",
+      "experiment_date": "2021-11-18",
+      "process": {
+        "synthesis_method": "CVD (저압)",
+        "temperature_C": 1000,
+        "gas": "CH4, H2 (유량 미기재)",
+        "substrate": "구리 부스바"
+      },
+      "measured_properties": {
+        "reaction_time_min_variants": [0, 30, 60],
+        "thermal_conductivity_Cu_W_mK": 400,
+        "thermal_conductivity_graphene_W_mK": 5000
+      },
+      "verdict": "계획단계(측정예정)",
+      "notes": "정량적 전기전도도/저항/온도상승 데이터 없음. 열전도성 향상이 핵심 기대효과로 강조"
+    },
+    {
+      "row_id": 38,
+      "source_file": "2021-11-18_ GSQ 그래핀 구리 전선.pptx",
+      "experiment_date": "2021-11-18",
+      "process": {
+        "synthesis_method": "CVD (수정관 권취방식)",
+        "reaction_time_min": 30,
+        "substrate": "구리 단선, 3m x 10가닥 연선 예정"
+      },
+      "measured_properties": {},
+      "verdict": "합성완료, 연선제작 예정(결과미도출)",
+      "notes": "롤투롤 연속공정 필요성 제기"
+    },
+    {
+      "row_id": 39,
+      "source_file": "[제일테크노스] 연구개발계획서_최종_수정.pdf",
+      "experiment_date": null,
+      "process": {"note": "제안된 연구개발계획(2026-2030), 선행제품 실측 참고데이터"},
+      "measured_properties": {
+        "surface_temp_C_control_7kW": 27, "surface_temp_C_test_7kW": 21,
+        "cross_section_mm2_control": 24.4, "cross_section_mm2_test": 21.9,
+        "cross_section_reduction_pct": 10,
+        "test_condition": "220V/32A"
+      },
+      "verdict": "선행제품(7kW) 실측 참고자료 - 2025년 창업중심대학 보고서와 동일 데이터로 추정",
+      "notes": "1MW 목표를 위한 baseline 데이터로 인용됨"
+    },
+    {
+      "row_id": 40,
+      "source_file": "am2c13686_si_001.pdf (ACS 논문 SI, 외부 벤치마크)",
+      "experiment_date": null,
+      "process": {
+        "synthesis_method": "CVD(Ni촉매)+전기도금(Cu EP)",
+        "substrate": "그래핀 약10층, PET기판 투과도75.39%",
+        "other_conditions": "Cu EP 시간 0-500초 가변"
+      },
+      "measured_properties": {
+        "current_density_A_cm2_max": "1.0E6 (500초 EP)",
+        "specific_conductivity_S_cm_mg": "1E6-1E8",
+        "tensile_strength_ratio": ">=2.5x (상용Cu대비)",
+        "comparison_wire_diameter_um": 50
+      },
+      "verdict": "외부벤치마크(양품)",
+      "notes": "그래핀-Cu 코어쉘 섬유, EP시간 증가에 따라 전도도/전류밀도/인장강도 모두 향상"
+    },
+    {
+      "row_id": 41,
+      "source_file": "cm7b01276_si_001.pdf (ACS 논문 SI, 외부 벤치마크)",
+      "experiment_date": null,
+      "process": {
+        "synthesis_method": "CNT 표면처리(산처리/티올화)+Cu전기도금+열처리",
+        "substrate": "CNT fiber core-shell Cu"
+      },
+      "measured_properties": {
+        "tensile_strength_MPa": [670, 1210],
+        "youngs_modulus_GPa": [151, 212],
+        "elongation_pct": [1.35, 1.66],
+        "electrical_conductivity_S_m": ["2.8E7", "4.0E7"],
+        "specific_conductivity_S_cm2_g": ["6.4E4", "8.0E4"],
+        "ampacity_A_cm2": ["0.68E5", "1.12E5"],
+        "TCR_per_C": ["1.36E-3", "2.06E-3"]
+      },
+      "verdict": "외부벤치마크(고성능)",
+      "notes": "티올기반 표면개질(SH-CNTs/Cu@Cu)이 상용Cu대비 비강도/비전도도 최대화"
+    },
+    {
+      "row_id": 42,
+      "source_file": "N-doped_graphene-based_copper_nanocomposite_with_u.pdf (외부 벤치마크)",
+      "experiment_date": null,
+      "process": {
+        "synthesis_method": "H2 plasma pretreat(600W,10Torr,H2 30sccm,5min) + N-doping plasma(800W,10Torr,N2 50sccm,10min)",
+        "precursor": "실크 피브로인 7wt%",
+        "substrate": "Cu 0.25mm(99.99%), 그래핀층 ~500nm"
+      },
+      "measured_properties": {
+        "resistivity_uOhm_cm_composite": 0.16,
+        "resistivity_uOhm_cm_pure_Cu": 2.11,
+        "resistivity_ratio_pct": 7.6,
+        "thermal_conductivity_W_mK": 538,
+        "thermal_conductivity_ratio_pct_of_Cu": 138,
+        "thermal_diffusivity_mm2_s": 161,
+        "raman_D_peak_cm-1": 1365,
+        "raman_G_peak_cm-1": 1590,
+        "raman_ID_IG": 0.85,
+        "N_content_at_pct": 5.2
+      },
+      "verdict": "외부벤치마크(초저저항, 고열전도 동시달성)",
+      "notes": "강한 계면결합에 기인. GAIQ ML모델의 이론적 상한 벤치마크로 유용"
+    }
+  ],
+  "external_benchmark_papers_summary": [
+    {"paper": "Electrical_and_thermal_conductivity_of_low_tempera.pdf", "synthesis": "CVD 750-1000C, Ni/C2H2, Cu/CH4, Cu/C2H2", "key_finding": "저온CVD(750C)도 연속단층그래핀 가능, rho∝La^-1, K∝La^(1/3), rho*K^3=상수"},
+    {"paper": "Onlinepublished_Copper-graphene...interconnects.pdf", "synthesis": "저온(400C) APCVD, 벤젠/피리딘 탄소소스", "key_finding": "Cu/N-Graphene 저항9.25uOhm.cm(Cu 9.58), 파괴전류밀도 24.1%향상, MTTF>1E6s @100C,3MA/cm2"},
+    {"paper": "pssa.202000704.pdf", "synthesis": "in-situ plasma CVD 150-400C, Ar/H2/CH4=12/10/0.5sccm, Ti촉매층", "key_finding": "ID/IG 0.01-0.02, 면저항89ohm/sq, 이동도1.23E4cm2/Vs, 유연캐패시터 투과율97.4%"},
+    {"paper": "em3c00249.pdf", "synthesis": "CNT/그래핀 섬유 습식방사/K도핑", "key_finding": "그래핀섬유 22.4MS/m(~38%IACS),1575W/mK; Cu-CNT필름 47%IACS; Covetic 130%IACS(국소)"},
+    {"paper": "in-situ synthesis of graphene_국일제지.pdf", "synthesis": "CVD, Ni촉매", "key_finding": "저온 그래핀 합성 검토(제지회사 자료, 세부수치 요약 필요시 재조사)"},
+    {"paper": "그래핀_방열응용_v2_GSC.pdf", "synthesis": "필터레이션+에폭시 침윤", "key_finding": "그래핀 열전도도 4000W/mK(이론), 상용 PGS시리즈 600-1700W/mK"},
+    {"paper": "그래핀__전자파차폐.pdf", "synthesis": "CVD graphene 0.335nm", "key_finding": "투과율 91.5-97.2%, 2층그래핀 EMI흡수 발열 확인, SE=-10log|T|(dB)"}
+  ]
+}
