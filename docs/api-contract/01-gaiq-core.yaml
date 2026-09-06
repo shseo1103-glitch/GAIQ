@@ -1,0 +1,1990 @@
+# ============================================================================
+# 01-gaiq-core.yaml — GAIQ 1단계(MVP) 핵심 API 계약
+# ============================================================================
+# 소스: docs/design/01-erd.md (organization/user_account/equipment_model/raw_material/
+#       substrate/measurement_equipment/qc_threshold_spec/synthesis_batch/
+#       synthesis_process_param/qc_measurement/raman_spectrum_raw/ml_model_version/
+#       ml_prediction_log/action_log), docs/design/02-screen-spec.md (SCR-01~SCR-10)
+#
+# 범위: 인증(JWT), 조직/사용자(멀티테넌트 온보딩 포함), 마스터데이터(장비/원료/기판/
+#       측정장비/QC기준), 공정배치+공정파라미터, QC측정+라만원본, ML모델+예측로그,
+#       대시보드 위젯, 감사로그(action_log). 2단계 예정 도메인(레시피버전/LOT추적/
+#       CoA/보안인터록)은 본 계약에 포함하지 않는다(단, certificate_coa 테이블
+#       skeleton만 DB에 존재 — API는 2단계에서 별도 계약 작성).
+#
+# 공통 스키마(ErrorResponse/PageResponse)는 자체완결성을 위해 인라인 재정의한다.
+# ============================================================================
+
+openapi: 3.0.3
+info:
+  title: GAIQ API — 1단계(MVP) 핵심 계약
+  description: >
+    그래핀 CVD 합성 공정 데이터 축적 + 룰기반/ML(GPR 주모델+RandomForest 보조) 하이브리드
+    진단을 제공하는 멀티테넌트 SaaS 플랫폼 GAIQ(Graphene AI-QC)의 1단계 핵심 API.
+    조직(PRODUCER_GRAPHENE_ELECTRIC/ADOPTER) 단위 데이터 격리를 전제로 하며, 모든
+    업무 엔드포인트는 인증된 사용자의 org_id 컨텍스트로 자동 스코핑된다(PLATFORM_ADMIN
+    제외).
+  version: "0.1.0"
+servers:
+  - url: http://localhost:8081/api/v1
+    description: 로컬 개발 서버(GAIQ 백엔드, 8000-8999 포트 대역 중 8081 가정)
+
+tags:
+  - name: 인증
+    description: 로그인/JWT 발급/본인정보 조회 (SCR-01)
+  - name: 조직-온보딩
+    description: 신규 도입업체(ADOPTER) 가입신청/승인/반려 (SCR-03)
+  - name: 조직-사용자관리
+    description: 조직 정보 및 조직 내 사용자 계정 CRUD (SCR-04)
+  - name: 마스터데이터
+    description: 장비모델/원료/기판/측정장비/QC기준 마스터 CRUD
+  - name: 공정배치
+    description: 공정 배치 등록 및 공정파라미터 시계열 입력 (SCR-05)
+  - name: 품질측정
+    description: QC 측정값 등록/조회, 라만 스펙트럼 원본 업로드 (SCR-06)
+  - name: AI진단
+    description: 룰기반 판정 결과 + 개선안 (SCR-07)
+  - name: ML진단
+    description: ML 모델 버전 및 예측 로그 (SCR-08)
+  - name: 배치이력
+    description: 배치별 파라미터/측정값/판정결과 통합 조회 (SCR-09)
+  - name: 대시보드
+    description: 배치 진행현황/QC결과/ML신뢰도 위젯 (SCR-02)
+  - name: 감사로그
+    description: 관리 행동 로그(before/after) 조회 (SCR-10)
+
+security:
+  - bearerAuth: []
+
+paths:
+  # ==========================================================================
+  # 인증 (SCR-01)
+  # ==========================================================================
+  /auth/login:
+    post:
+      tags: [인증]
+      summary: 로그인
+      description: 조직코드+로그인ID+비밀번호로 인증하고 JWT Access/Refresh Token을 발급한다.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [orgCode, loginId, password]
+              properties:
+                orgCode:
+                  type: string
+                loginId:
+                  type: string
+                password:
+                  type: string
+                  format: password
+      responses:
+        "200":
+          description: 로그인 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                  refreshToken:
+                    type: string
+                  user:
+                    $ref: "#/components/schemas/UserAccount"
+        "401":
+          description: 인증 실패
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: 조직이 ACTIVE 상태가 아님(PENDING/SUSPENDED)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/logout:
+    post:
+      tags: [인증]
+      summary: 로그아웃
+      description: 현재 Access Token을 무효화(블랙리스트 등록)한다.
+      responses:
+        "204":
+          description: 로그아웃 성공
+
+  /auth/me:
+    get:
+      tags: [인증]
+      summary: 본인 정보 조회
+      description: 현재 JWT의 사용자/조직 정보를 조회한다.
+      responses:
+        "200":
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserAccount"
+
+  # ==========================================================================
+  # 조직 - 온보딩 (SCR-03)
+  # ==========================================================================
+  /organizations/onboarding-requests:
+    post:
+      tags: [조직-온보딩]
+      summary: 신규 도입업체(ADOPTER) 가입 신청
+      description: 비로그인 상태에서 접근 가능. 승인 전까지 organization.status=PENDING.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OnboardingRequest"
+      responses:
+        "201":
+          description: 신청 접수 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Organization"
+
+  /organizations/{orgId}/approve:
+    parameters:
+      - $ref: "#/components/parameters/OrgIdParam"
+    post:
+      tags: [조직-온보딩]
+      summary: 온보딩 승인
+      description: PLATFORM_ADMIN 전용. organization.status를 ACTIVE로 전환하고 최초 관리자 계정을 생성한다.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                initialAdminLoginId:
+                  type: string
+                initialAdminEmail:
+                  type: string
+      responses:
+        "200":
+          description: 승인 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Organization"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /organizations/{orgId}/reject:
+    parameters:
+      - $ref: "#/components/parameters/OrgIdParam"
+    post:
+      tags: [조직-온보딩]
+      summary: 온보딩 반려
+      description: PLATFORM_ADMIN 전용.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason:
+                  type: string
+      responses:
+        "200":
+          description: 반려 처리 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Organization"
+
+  # ==========================================================================
+  # 조직 - 사용자관리 (SCR-04)
+  # ==========================================================================
+  /organizations:
+    get:
+      tags: [조직-사용자관리]
+      summary: 조직 목록 조회
+      description: PLATFORM_ADMIN 전용. status 필터로 온보딩 대기 목록도 조회 가능(SCR-03 겸용).
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/SizeParam"
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [PENDING, ACTIVE, SUSPENDED]
+        - name: orgType
+          in: query
+          schema:
+            type: string
+            enum: [PRODUCER_GRAPHENE_ELECTRIC, ADOPTER, ADMIN]
+      responses:
+        "200":
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/PageResponse"
+                  - type: object
+                    properties:
+                      content:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Organization"
+
+  /organizations/{orgId}:
+    parameters:
+      - $ref: "#/components/parameters/OrgIdParam"
+    get:
+      tags: [조직-사용자관리]
+      summary: 조직 상세 조회
+      responses:
+        "200":
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Organization"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      tags: [조직-사용자관리]
+      summary: 조직 정보 수정(상태 변경 포함)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OrganizationUpsertRequest"
+      responses:
+        "200":
+          description: 수정 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Organization"
+
+  /organizations/{orgId}/users:
+    parameters:
+      - $ref: "#/components/parameters/OrgIdParam"
+    get:
+      tags: [조직-사용자관리]
+      summary: 조직 내 사용자 목록 조회
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/SizeParam"
+      responses:
+        "200":
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/PageResponse"
+                  - type: object
+                    properties:
+                      content:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/UserAccount"
+    post:
+      tags: [조직-사용자관리]
+      summary: 조직 내 사용자 등록
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserAccountCreateRequest"
+      responses:
+        "201":
+          description: 등록 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserAccount"
+
+  /users/{userId}:
+    parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+    put:
+      tags: [조직-사용자관리]
+      summary: 사용자 정보 수정
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserAccountUpdateRequest"
+      responses:
+        "200":
+          description: 수정 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserAccount"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /users/{userId}/reset-password:
+    parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+    post:
+      tags: [조직-사용자관리]
+      summary: 비밀번호 초기화
+      responses:
+        "200":
+          description: 초기화 성공(임시 비밀번호 발급 또는 초기화 메일 발송)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  temporaryPasswordIssued:
+                    type: boolean
+
+  # ==========================================================================
+  # 마스터데이터
+  # ==========================================================================
+  /equipment-models:
+    get:
+      tags: [마스터데이터]
+      summary: 장비모델 목록 조회
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/SizeParam"
+        - name: equipmentType
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/PageResponse"
+                  - type: object
+                    properties:
+                      content:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/EquipmentModel"
+    post:
+      tags: [마스터데이터]
+      summary: 장비모델 등록
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EquipmentModelUpsertRequest"
+      responses:
+        "201":
+          description: 등록 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EquipmentModel"
+
+  /equipment-models/{equipmentModelId}:
+    parameters:
+      - name: equipmentModelId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+    put:
+      tags: [마스터데이터]
+      summary: 장비모델 수정
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EquipmentModelUpsertRequest"
+      responses:
+        "200":
+          description: 수정 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EquipmentModel"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /raw-materials:
+    get:
+      tags: [마스터데이터]
+      summary: 원료 목록 조회
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/SizeParam"
+      responses:
+        "200":
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/PageResponse"
+                  - type: object
+                    properties:
+                      content:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/RawMaterial"
+    post:
+      tags: [마스터데이터]
+      summary: 원료 등록
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RawMaterialUpsertRequest"
+      responses:
+        "201":
+          description: 등록 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RawMaterial"
+
+  /substrates:
+    get:
+      tags: [마스터데이터]
+      summary: 기판 목록 조회
+      description: substrate_type으로 연선(CU_STRAND)/부스바(BUSBAR) 등을 구분 조회한다.
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/SizeParam"
+        - name: substrateType
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/PageResponse"
+                  - type: object
+                    properties:
+                      content:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Substrate"
+    post:
+      tags: [마스터데이터]
+      summary: 기판 등록
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubstrateUpsertRequest"
+      responses:
+        "201":
+          description: 등록 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Substrate"
+
+  /measurement-equipments:
+    get:
+      tags: [마스터데이터]
+      summary: 측정장비 목록 조회
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/SizeParam"
+      responses:
+        "200":
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/PageResponse"
+                  - type: object
+                    properties:
+                      content:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/MeasurementEquipment"
+    post:
+      tags: [마스터데이터]
+      summary: 측정장비 등록
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MeasurementEquipmentUpsertRequest"
+      responses:
+        "201":
+          description: 등록 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MeasurementEquipment"
+
+  /qc-threshold-specs:
+    get:
+      tags: [마스터데이터]
+      summary: QC 판정기준 조회
+      description: >
+        metric_code + spec_type(TARGET_STAGE1/TARGET_STAGE2/VALIDATED_ACHIEVEMENT) 조합으로 조회.
+        SCR-06에서 측정값 저장 시 자동판정 근거로 사용된다.
+      parameters:
+        - name: metricCode
+          in: query
+          schema:
+            type: string
+        - name: specType
+          in: query
+          schema:
+            type: string
+            enum: [TARGET_STAGE1, TARGET_STAGE2, VALIDATED_ACHIEVEMENT]
+        - name: orgId
+          in: query
+          description: 조직전용 기준 조회(미지정시 플랫폼 공통기준 포함 전체 반환)
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/QcThresholdSpec"
+    post:
+      tags: [마스터데이터]
+      summary: QC 판정기준 등록
+      description: PLATFORM_ADMIN 전용.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QcThresholdSpecUpsertRequest"
+      responses:
+        "201":
+          description: 등록 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QcThresholdSpec"
+
+  # ==========================================================================
+  # 공정배치 (SCR-05)
+  # ==========================================================================
+  /batches:
+    get:
+      tags: [공정배치, 배치이력]
+      summary: 배치 목록 조회 (SCR-09)
+      description: 요청자의 org_id로 자동 스코핑된다(PLATFORM_ADMIN은 orgId 파라미터로 전체/특정조직 조회 가능).
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/SizeParam"
+        - $ref: "#/components/parameters/SortParam"
+        - name: batchNo
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [PLANNED, RUNNING, COMPLETED, FAILED, ABORTED]
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: orgId
+          in: query
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/PageResponse"
+                  - type: object
+                    properties:
+                      content:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/SynthesisBatch"
+    post:
+      tags: [공정배치]
+      summary: 신규 배치 등록
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SynthesisBatchCreateRequest"
+      responses:
+        "201":
+          description: 등록 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SynthesisBatch"
+
+  /batches/{batchId}:
+    parameters:
+      - $ref: "#/components/parameters/BatchIdParam"
+    get:
+      tags: [공정배치, 배치이력]
+      summary: 배치 상세 조회
+      responses:
+        "200":
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SynthesisBatch"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /batches/{batchId}/status:
+    parameters:
+      - $ref: "#/components/parameters/BatchIdParam"
+    patch:
+      tags: [공정배치]
+      summary: 배치 상태 변경
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status:
+                  type: string
+                  enum: [PLANNED, RUNNING, COMPLETED, FAILED, ABORTED]
+      responses:
+        "200":
+          description: 변경 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SynthesisBatch"
+
+  /batches/{batchId}/process-params:
+    parameters:
+      - $ref: "#/components/parameters/BatchIdParam"
+    get:
+      tags: [공정배치, 배치이력]
+      summary: 배치 공정파라미터 시계열 조회
+      parameters:
+        - name: paramName
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SynthesisProcessParam"
+    post:
+      tags: [공정배치]
+      summary: 공정파라미터 일괄 등록
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [params]
+              properties:
+                params:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/SynthesisProcessParamCreateRequest"
+      responses:
+        "201":
+          description: 등록 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SynthesisProcessParam"
+
+  # ==========================================================================
+  # 품질측정 (SCR-06)
+  # ==========================================================================
+  /batches/{batchId}/qc-measurements:
+    parameters:
+      - $ref: "#/components/parameters/BatchIdParam"
+    get:
+      tags: [품질측정, 배치이력]
+      summary: 배치 QC 측정값 목록 조회
+      responses:
+        "200":
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/QcMeasurement"
+    post:
+      tags: [품질측정]
+      summary: QC 측정값 등록
+      description: >
+        저장 시 서버가 `qc_threshold_spec`과 대조하여 judged_result/judged_spec_type을
+        자동 계산한다(룰기반 1차 판정).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QcMeasurementCreateRequest"
+      responses:
+        "201":
+          description: 등록 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QcMeasurement"
+
+  /batches/{batchId}/raman-spectra:
+    parameters:
+      - $ref: "#/components/parameters/BatchIdParam"
+    get:
+      tags: [품질측정, 배치이력]
+      summary: 배치 라만 스펙트럼 원본 목록 조회
+      responses:
+        "200":
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RamanSpectrumRaw"
+    post:
+      tags: [품질측정]
+      summary: 라만 스펙트럼 CSV 업로드
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                measurementEquipmentId:
+                  type: integer
+                  format: int64
+                measuredAt:
+                  type: string
+                  format: date-time
+      responses:
+        "201":
+          description: 업로드 성공(파싱된 wavenumber/intensity 배열 포함)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RamanSpectrumRaw"
+
+  # ==========================================================================
+  # AI 진단 (SCR-07)
+  # ==========================================================================
+  /batches/{batchId}/diagnosis:
+    parameters:
+      - $ref: "#/components/parameters/BatchIdParam"
+    get:
+      tags: [AI진단]
+      summary: 룰기반 판정등급 + 근본원인분석 + 개선안 조회
+      responses:
+        "200":
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BatchDiagnosis"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  # ==========================================================================
+  # ML 진단 (SCR-08)
+  # ==========================================================================
+  /ml-models:
+    get:
+      tags: [ML진단]
+      summary: ML 모델 버전 목록 조회
+      parameters:
+        - name: targetMetricCode
+          in: query
+          schema:
+            type: string
+        - name: activeOnly
+          in: query
+          schema:
+            type: boolean
+            default: true
+      responses:
+        "200":
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MlModelVersion"
+
+  /ml-models/{modelId}:
+    parameters:
+      - name: modelId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+    get:
+      tags: [ML진단]
+      summary: ML 모델 버전 상세(성능지표 포함) 조회
+      responses:
+        "200":
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MlModelVersion"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /ml-models/{modelId}/predictions:
+    parameters:
+      - name: modelId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+    get:
+      tags: [ML진단]
+      summary: 모델의 예측 로그 목록(예측 vs 실측 비교용) 조회
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/SizeParam"
+      responses:
+        "200":
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/PageResponse"
+                  - type: object
+                    properties:
+                      content:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/MlPredictionLog"
+
+  /batches/{batchId}/ml-predictions:
+    parameters:
+      - $ref: "#/components/parameters/BatchIdParam"
+    get:
+      tags: [ML진단, 배치이력]
+      summary: 배치의 ML 예측 요약 조회
+      responses:
+        "200":
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MlPredictionLog"
+    post:
+      tags: [ML진단]
+      summary: 배치 공정파라미터 기준 신규 ML 예측 요청
+      description: 현재 활성 모델(is_active=true)로 예측을 실행하고 ml_prediction_log를 생성한다.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [targetMetricCode]
+              properties:
+                targetMetricCode:
+                  type: string
+      responses:
+        "201":
+          description: 예측 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MlPredictionLog"
+
+  /batches/{batchId}/ml-predictions/{predictionId}:
+    parameters:
+      - $ref: "#/components/parameters/BatchIdParam"
+      - name: predictionId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+    get:
+      tags: [ML진단]
+      summary: 개별 예측 상세 조회(신뢰구간/신뢰도 포함)
+      responses:
+        "200":
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MlPredictionLog"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  # ==========================================================================
+  # 대시보드 (SCR-02)
+  # ==========================================================================
+  /dashboard/batches/summary:
+    get:
+      tags: [대시보드]
+      summary: 배치 진행현황 요약(진행중/완료/실패 건수)
+      responses:
+        "200":
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  planned:
+                    type: integer
+                  running:
+                    type: integer
+                  completed:
+                    type: integer
+                  failed:
+                    type: integer
+
+  /dashboard/qc-results/recent:
+    get:
+      tags: [대시보드]
+      summary: 최근 QC 판정결과 목록
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        "200":
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/QcMeasurement"
+
+  /dashboard/ml-confidence-alerts:
+    get:
+      tags: [대시보드]
+      summary: ML 예측 신뢰도 경고 건수(LOW/DATA_INSUFFICIENT)
+      responses:
+        "200":
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  lowConfidenceCount:
+                    type: integer
+                  dataInsufficientCount:
+                    type: integer
+
+  # ==========================================================================
+  # 감사로그 (SCR-10)
+  # ==========================================================================
+  /audit/action-logs:
+    get:
+      tags: [감사로그]
+      summary: 관리 행동 로그 목록 조회
+      description: PLATFORM_ADMIN 전용. (구 CSMS `GET /api/actionLog/getList` 패턴 재사용)
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/SizeParam"
+        - $ref: "#/components/parameters/SortParam"
+        - name: module
+          in: query
+          schema:
+            type: string
+        - name: actorUserId
+          in: query
+          schema:
+            type: integer
+            format: int64
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/PageResponse"
+                  - type: object
+                    properties:
+                      content:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/ActionLog"
+
+  /audit/action-logs/{actionLogId}:
+    parameters:
+      - name: actionLogId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+    get:
+      tags: [감사로그]
+      summary: 관리 행동 로그 상세(before/after) 조회
+      responses:
+        "200":
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ActionLog"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+components:
+  parameters:
+    PageParam:
+      name: page
+      in: query
+      schema:
+        type: integer
+        format: int32
+        minimum: 0
+        default: 0
+    SizeParam:
+      name: size
+      in: query
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 200
+        default: 20
+    SortParam:
+      name: sort
+      in: query
+      schema:
+        type: array
+        items:
+          type: string
+      example: ["createdAt,DESC"]
+    OrgIdParam:
+      name: orgId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+    BatchIdParam:
+      name: batchId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+
+  responses:
+    NotFound:
+      description: 대상을 찾을 수 없음
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "Spring Security + jjwt 기반 JWT Access Token. `Authorization: Bearer <token>` 헤더로 전달."
+
+  schemas:
+    # ---- 공통 ----
+    ErrorResponse:
+      type: object
+      required: [code, message, timestamp, path]
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        path:
+          type: string
+
+    PageResponse:
+      type: object
+      required: [content, totalElements, totalPages, page, size]
+      properties:
+        content:
+          type: array
+          items: {}
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        page:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+
+    AuditFields:
+      type: object
+      properties:
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    # ---- 조직/사용자 ----
+    Organization:
+      allOf:
+        - $ref: "#/components/schemas/AuditFields"
+        - type: object
+          required: [orgId, orgCode, orgType, orgName, status]
+          properties:
+            orgId:
+              type: integer
+              format: int64
+            orgCode:
+              type: string
+            orgType:
+              type: string
+              enum: [PRODUCER_GRAPHENE_ELECTRIC, ADOPTER, ADMIN]
+            orgName:
+              type: string
+            industryType:
+              type: string
+              nullable: true
+            businessRegNo:
+              type: string
+              nullable: true
+            status:
+              type: string
+              enum: [PENDING, ACTIVE, SUSPENDED]
+            contactName:
+              type: string
+              nullable: true
+            contactEmail:
+              type: string
+              nullable: true
+            contactPhone:
+              type: string
+              nullable: true
+            approvedBy:
+              type: integer
+              format: int64
+              nullable: true
+            approvedAt:
+              type: string
+              format: date-time
+              nullable: true
+
+    OnboardingRequest:
+      type: object
+      required: [orgName, contactName, contactEmail]
+      properties:
+        orgName:
+          type: string
+        industryType:
+          type: string
+        businessRegNo:
+          type: string
+        contactName:
+          type: string
+        contactEmail:
+          type: string
+        contactPhone:
+          type: string
+
+    OrganizationUpsertRequest:
+      type: object
+      properties:
+        orgName:
+          type: string
+        industryType:
+          type: string
+        status:
+          type: string
+          enum: [PENDING, ACTIVE, SUSPENDED]
+        contactName:
+          type: string
+        contactEmail:
+          type: string
+        contactPhone:
+          type: string
+
+    UserAccount:
+      allOf:
+        - $ref: "#/components/schemas/AuditFields"
+        - type: object
+          required: [userId, orgId, loginId, role, name, status]
+          properties:
+            userId:
+              type: integer
+              format: int64
+            orgId:
+              type: integer
+              format: int64
+            loginId:
+              type: string
+            role:
+              type: string
+              enum: [PROCESS_ENGINEER, OPERATOR, PLATFORM_ADMIN]
+            name:
+              type: string
+            email:
+              type: string
+              nullable: true
+            phone:
+              type: string
+              nullable: true
+            status:
+              type: string
+              enum: [ACTIVE, SUSPENDED]
+            lastLoginAt:
+              type: string
+              format: date-time
+              nullable: true
+
+    UserAccountCreateRequest:
+      type: object
+      required: [loginId, password, role, name]
+      properties:
+        loginId:
+          type: string
+        password:
+          type: string
+          format: password
+        role:
+          type: string
+          enum: [PROCESS_ENGINEER, OPERATOR, PLATFORM_ADMIN]
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+
+    UserAccountUpdateRequest:
+      type: object
+      properties:
+        role:
+          type: string
+          enum: [PROCESS_ENGINEER, OPERATOR, PLATFORM_ADMIN]
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        status:
+          type: string
+          enum: [ACTIVE, SUSPENDED]
+
+    # ---- 마스터데이터 ----
+    EquipmentModel:
+      allOf:
+        - $ref: "#/components/schemas/AuditFields"
+        - type: object
+          required: [equipmentModelId, modelCode, modelName, equipmentType, processType]
+          properties:
+            equipmentModelId:
+              type: integer
+              format: int64
+            modelCode:
+              type: string
+            modelName:
+              type: string
+            equipmentType:
+              type: string
+              enum: [T_CVD, PECVD, LPCVD, APCVD, R2R, AIR_JET_MILL, OTHER]
+            processType:
+              type: string
+              enum: [BATCH, R2R]
+            manufacturer:
+              type: string
+              nullable: true
+            specJson:
+              type: object
+              additionalProperties: true
+              nullable: true
+
+    EquipmentModelUpsertRequest:
+      type: object
+      required: [modelCode, modelName, equipmentType, processType]
+      properties:
+        modelCode:
+          type: string
+        modelName:
+          type: string
+        equipmentType:
+          type: string
+          enum: [T_CVD, PECVD, LPCVD, APCVD, R2R, AIR_JET_MILL, OTHER]
+        processType:
+          type: string
+          enum: [BATCH, R2R]
+        manufacturer:
+          type: string
+        specJson:
+          type: object
+          additionalProperties: true
+
+    RawMaterial:
+      allOf:
+        - $ref: "#/components/schemas/AuditFields"
+        - type: object
+          required: [rawMaterialId, materialCode, materialName, materialType]
+          properties:
+            rawMaterialId:
+              type: integer
+              format: int64
+            materialCode:
+              type: string
+            materialName:
+              type: string
+            materialType:
+              type: string
+              enum: [GAS, LIQUID_PRECURSOR, SOLID]
+            purityPct:
+              type: number
+              nullable: true
+            lotNo:
+              type: string
+              nullable: true
+            supplier:
+              type: string
+              nullable: true
+
+    RawMaterialUpsertRequest:
+      type: object
+      required: [materialCode, materialName, materialType]
+      properties:
+        materialCode:
+          type: string
+        materialName:
+          type: string
+        materialType:
+          type: string
+          enum: [GAS, LIQUID_PRECURSOR, SOLID]
+        purityPct:
+          type: number
+        lotNo:
+          type: string
+        supplier:
+          type: string
+
+    Substrate:
+      allOf:
+        - $ref: "#/components/schemas/AuditFields"
+        - type: object
+          required: [substrateId, substrateCode, substrateType]
+          properties:
+            substrateId:
+              type: integer
+              format: int64
+            substrateCode:
+              type: string
+            substrateType:
+              type: string
+              enum: [CU_WIRE, CU_STRAND, BUSBAR, SIO2_WAFER, SI_WAFER, GE_SI_WAFER, PET, GLASS, QUARTZ, OTHER]
+            specDesignation:
+              type: string
+              nullable: true
+            crossSectionMm2:
+              type: number
+              description: "SQ 값. 연선 총단면적(mm²) 단일 정의"
+              nullable: true
+            diameterMm:
+              type: number
+              nullable: true
+            strandCount:
+              type: integer
+              nullable: true
+
+    SubstrateUpsertRequest:
+      type: object
+      required: [substrateCode, substrateType]
+      properties:
+        substrateCode:
+          type: string
+        substrateType:
+          type: string
+          enum: [CU_WIRE, CU_STRAND, BUSBAR, SIO2_WAFER, SI_WAFER, GE_SI_WAFER, PET, GLASS, QUARTZ, OTHER]
+        specDesignation:
+          type: string
+        crossSectionMm2:
+          type: number
+        diameterMm:
+          type: number
+        strandCount:
+          type: integer
+
+    MeasurementEquipment:
+      allOf:
+        - $ref: "#/components/schemas/AuditFields"
+        - type: object
+          required: [measurementEquipmentId, equipmentCode, equipmentName, equipmentType]
+          properties:
+            measurementEquipmentId:
+              type: integer
+              format: int64
+            equipmentCode:
+              type: string
+            equipmentName:
+              type: string
+            equipmentType:
+              type: string
+              enum: [RAMAN, SEM, AFM, EBSD, FOUR_PROBE, IR_CAMERA, BULGE_TESTER, OTHER]
+            manufacturer:
+              type: string
+              nullable: true
+            calibrationDueDate:
+              type: string
+              format: date
+              nullable: true
+
+    MeasurementEquipmentUpsertRequest:
+      type: object
+      required: [equipmentCode, equipmentName, equipmentType]
+      properties:
+        equipmentCode:
+          type: string
+        equipmentName:
+          type: string
+        equipmentType:
+          type: string
+          enum: [RAMAN, SEM, AFM, EBSD, FOUR_PROBE, IR_CAMERA, BULGE_TESTER, OTHER]
+        manufacturer:
+          type: string
+        calibrationDueDate:
+          type: string
+          format: date
+
+    QcThresholdSpec:
+      allOf:
+        - $ref: "#/components/schemas/AuditFields"
+        - type: object
+          required: [thresholdId, metricCode, metricName, unit, specType, comparator]
+          properties:
+            thresholdId:
+              type: integer
+              format: int64
+            metricCode:
+              type: string
+            metricName:
+              type: string
+            unit:
+              type: string
+            specType:
+              type: string
+              enum: [TARGET_STAGE1, TARGET_STAGE2, VALIDATED_ACHIEVEMENT]
+            comparator:
+              type: string
+              enum: ["<=", ">=", "=", RANGE]
+            thresholdValue:
+              type: number
+              nullable: true
+            thresholdValueMax:
+              type: number
+              nullable: true
+            sourceDoc:
+              type: string
+              nullable: true
+            orgId:
+              type: integer
+              format: int64
+              nullable: true
+              description: "NULL이면 플랫폼 공통기준"
+            effectiveFrom:
+              type: string
+              format: date
+              nullable: true
+
+    QcThresholdSpecUpsertRequest:
+      type: object
+      required: [metricCode, metricName, unit, specType, comparator]
+      properties:
+        metricCode:
+          type: string
+        metricName:
+          type: string
+        unit:
+          type: string
+        specType:
+          type: string
+          enum: [TARGET_STAGE1, TARGET_STAGE2, VALIDATED_ACHIEVEMENT]
+        comparator:
+          type: string
+          enum: ["<=", ">=", "=", RANGE]
+        thresholdValue:
+          type: number
+        thresholdValueMax:
+          type: number
+        sourceDoc:
+          type: string
+        orgId:
+          type: integer
+          format: int64
+        effectiveFrom:
+          type: string
+          format: date
+
+    # ---- 공정배치 ----
+    SynthesisBatch:
+      allOf:
+        - $ref: "#/components/schemas/AuditFields"
+        - type: object
+          required: [batchId, orgId, batchNo, equipmentModelId, substrateId, processType, status]
+          properties:
+            batchId:
+              type: integer
+              format: int64
+            orgId:
+              type: integer
+              format: int64
+            batchNo:
+              type: string
+            equipmentModelId:
+              type: integer
+              format: int64
+            substrateId:
+              type: integer
+              format: int64
+            rawMaterialId:
+              type: integer
+              format: int64
+              nullable: true
+            processType:
+              type: string
+              enum: [BATCH, R2R]
+            startedAt:
+              type: string
+              format: date-time
+              nullable: true
+            endedAt:
+              type: string
+              format: date-time
+              nullable: true
+            status:
+              type: string
+              enum: [PLANNED, RUNNING, COMPLETED, FAILED, ABORTED]
+            operatorUserId:
+              type: integer
+              format: int64
+              nullable: true
+            recipeVersion:
+              type: string
+              nullable: true
+            notes:
+              type: string
+              nullable: true
+
+    SynthesisBatchCreateRequest:
+      type: object
+      required: [batchNo, equipmentModelId, substrateId, processType]
+      properties:
+        batchNo:
+          type: string
+        equipmentModelId:
+          type: integer
+          format: int64
+        substrateId:
+          type: integer
+          format: int64
+        rawMaterialId:
+          type: integer
+          format: int64
+        processType:
+          type: string
+          enum: [BATCH, R2R]
+        startedAt:
+          type: string
+          format: date-time
+        recipeVersion:
+          type: string
+        notes:
+          type: string
+
+    SynthesisProcessParam:
+      type: object
+      required: [paramId, batchId, paramName, paramValue, unit, recordedAt]
+      properties:
+        paramId:
+          type: integer
+          format: int64
+        batchId:
+          type: integer
+          format: int64
+        paramName:
+          type: string
+          enum: [CHAMBER_TEMP_C, CH4_FLOW_SCCM, H2_FLOW_SCCM, AR_FLOW_SCCM, CHAMBER_PRESSURE_PA, ANNEAL_TIME_MIN, GROWTH_TIME_MIN, ROLL_TENSION_KGM, WINDING_SPEED_MH, OTHER]
+        paramValue:
+          type: number
+        unit:
+          type: string
+        recordedAt:
+          type: string
+          format: date-time
+
+    SynthesisProcessParamCreateRequest:
+      type: object
+      required: [paramName, paramValue, unit]
+      properties:
+        paramName:
+          type: string
+          enum: [CHAMBER_TEMP_C, CH4_FLOW_SCCM, H2_FLOW_SCCM, AR_FLOW_SCCM, CHAMBER_PRESSURE_PA, ANNEAL_TIME_MIN, GROWTH_TIME_MIN, ROLL_TENSION_KGM, WINDING_SPEED_MH, OTHER]
+        paramValue:
+          type: number
+        unit:
+          type: string
+        recordedAt:
+          type: string
+          format: date-time
+
+    # ---- 품질측정 ----
+    QcMeasurement:
+      type: object
+      required: [qcMeasurementId, batchId, metricCode, unit, measuredAt]
+      properties:
+        qcMeasurementId:
+          type: integer
+          format: int64
+        batchId:
+          type: integer
+          format: int64
+        metricCode:
+          type: string
+        measuredValue:
+          type: number
+          nullable: true
+        unit:
+          type: string
+        measurementEquipmentId:
+          type: integer
+          format: int64
+          nullable: true
+        measuredAt:
+          type: string
+          format: date-time
+        judgedResult:
+          type: string
+          enum: [PASS, FAIL]
+          nullable: true
+        judgedSpecType:
+          type: string
+          enum: [TARGET_STAGE1, TARGET_STAGE2, VALIDATED_ACHIEVEMENT]
+          nullable: true
+        measuredByUserId:
+          type: integer
+          format: int64
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+
+    QcMeasurementCreateRequest:
+      type: object
+      required: [metricCode, unit, measuredAt]
+      properties:
+        metricCode:
+          type: string
+        measuredValue:
+          type: number
+        unit:
+          type: string
+        measurementEquipmentId:
+          type: integer
+          format: int64
+        measuredAt:
+          type: string
+          format: date-time
+        notes:
+          type: string
+
+    RamanSpectrumRaw:
+      type: object
+      required: [spectrumId, batchId, wavenumberArray, intensityArray, measuredAt]
+      properties:
+        spectrumId:
+          type: integer
+          format: int64
+        batchId:
+          type: integer
+          format: int64
+        measurementEquipmentId:
+          type: integer
+          format: int64
+          nullable: true
+        scanRangeCm1:
+          type: string
+          nullable: true
+          example: "1000-3000"
+        wavenumberArray:
+          type: array
+          items:
+            type: number
+        intensityArray:
+          type: array
+          items:
+            type: number
+        rawFilePath:
+          type: string
+          nullable: true
+        measuredAt:
+          type: string
+          format: date-time
+
+    # ---- AI 진단 ----
+    BatchDiagnosis:
+      type: object
+      properties:
+        batchId:
+          type: integer
+          format: int64
+        grade:
+          type: string
+          enum: [A, B, C]
+        metricResults:
+          type: array
+          items:
+            type: object
+            properties:
+              metricCode:
+                type: string
+              measuredValue:
+                type: number
+                nullable: true
+              judgedResult:
+                type: string
+                enum: [PASS, FAIL]
+              appliedSpecType:
+                type: string
+                enum: [TARGET_STAGE1, TARGET_STAGE2, VALIDATED_ACHIEVEMENT]
+        rootCauseSummary:
+          type: string
+          description: 룰기반 조건식 기반 근본원인 서술
+        improvementSuggestions:
+          type: array
+          items:
+            type: object
+            properties:
+              paramName:
+                type: string
+              currentValue:
+                type: number
+                nullable: true
+              recommendedValue:
+                type: number
+                nullable: true
+              rationale:
+                type: string
+
+    # ---- ML 진단 ----
+    MlModelVersion:
+      type: object
+      required: [modelId, targetMetricCode, algorithm, versionNo, trainedAt, trainingDataCount, isActive]
+      properties:
+        modelId:
+          type: integer
+          format: int64
+        targetMetricCode:
+          type: string
+        algorithm:
+          type: string
+          enum: [GPR, RANDOM_FOREST, LINEAR_REGRESSION, RULE_BASED_FALLBACK]
+        versionNo:
+          type: string
+        trainedAt:
+          type: string
+          format: date-time
+        trainingDataCount:
+          type: integer
+          description: "학습에 사용된 (공정조건,물성치) 페어 수. 1단계 초기 약 46~60건"
+        r2Score:
+          type: number
+          nullable: true
+        mae:
+          type: number
+          nullable: true
+        rmse:
+          type: number
+          nullable: true
+        kernelType:
+          type: string
+          nullable: true
+        modelFilePath:
+          type: string
+        isActive:
+          type: boolean
+        hyperparametersJson:
+          type: object
+          additionalProperties: true
+          nullable: true
+
+    MlPredictionLog:
+      type: object
+      required: [predictionId, batchId, modelId, predictedValue, predictedAt]
+      properties:
+        predictionId:
+          type: integer
+          format: int64
+        batchId:
+          type: integer
+          format: int64
+        modelId:
+          type: integer
+          format: int64
+        inputParamsJson:
+          type: object
+          additionalProperties: true
+        predictedValue:
+          type: number
+        predictedStdDev:
+          type: number
+          nullable: true
+          description: "GPR 예측 표준편차(불확실성 정량화)"
+        confidenceLevel:
+          type: string
+          enum: [HIGH, MEDIUM, LOW, DATA_INSUFFICIENT]
+          nullable: true
+        actualValue:
+          type: number
+          nullable: true
+        residual:
+          type: number
+          nullable: true
+        predictedAt:
+          type: string
+          format: date-time
+
+    # ---- 감사로그 ----
+    ActionLog:
+      type: object
+      required: [actionLogId, actorType, module, actionType, targetEntity, occurredAt]
+      properties:
+        actionLogId:
+          type: integer
+          format: int64
+        orgId:
+          type: integer
+          format: int64
+          nullable: true
+        actorUserId:
+          type: integer
+          format: int64
+          nullable: true
+        actorType:
+          type: string
+          enum: [USER, SYSTEM]
+        module:
+          type: string
+        actionType:
+          type: string
+          enum: [CREATE, UPDATE, DELETE, LOGIN, LOGOUT]
+        targetEntity:
+          type: string
+        targetEntityId:
+          type: integer
+          format: int64
+          nullable: true
+        beforeData:
+          type: object
+          additionalProperties: true
+          nullable: true
+        afterData:
+          type: object
+          additionalProperties: true
+          nullable: true
+        clientIp:
+          type: string
+          nullable: true
+        occurredAt:
+          type: string
+          format: date-time
