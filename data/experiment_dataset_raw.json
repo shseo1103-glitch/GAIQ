@@ -3,7 +3,9 @@
     "project": "GAIQ (Graphene AI-QC) - 그래핀일렉트릭 실험데이터셋",
     "generated_at": "2026-09-07",
     "source_directory": "/home/work/.openclaw/workspace/upload/",
-    "note": "각 row는 1개 실험/배치/시험 케이스. 결측치는 null. 단위는 unit 필드에 명시. [2026-09-07 업데이트: 위탁개발보고서 재첨부본(표+그래프 이미지 판독) 반영, row 43-46 추가 - T-CVD/R2R CVD 온도별 공정조건+단선여부 판정 데이터]",
+    "note": "각 row는 1개 실험/배치/시험 케이스. 결측치는 null. 단위는 unit 필드에 명시. [2026-09-07 업데이트: 위탁개발보고서 재첨부본(표+그래프 이미지 판독) 반영, row 43-46 추가 - T-CVD/R2R CVD 온도별 공정조건+단선여부 판정 데이터] [2026-09-07 2차 업데이트: SSOT를 '2025년 창업중심대학 최종보고서'로 재확인, external_benchmark_papers_summary에 커버리지(%)/IR온도상승/라만D-G비 관련 국내외 논문 8건 추가, 연선(SQ) 정의 확정(단선을 여러가닥 꼬은 연선의 전체 단면적, 1SQ=1mm2) 반영]",
+    "ssot_reference": "2025년 창업중심대학 최종보고서_(주)그래핀일렉트릭.pdf (사용자 확인, 2026-09-07) - [제일테크노스]연구개발계획서 및 그래핀전선과제개요보다 우선 신뢰",
+    "sq_definition_confirmed": "연선굵기(SQ) = 단선(single wire)을 여러가닥 꼬은 연선(stranded wire)의 전체(총) 단면적. 예: 10 SQ = 여러 단선을 꼬아 만든 연선의 총 단면적 10mm². 통상 1 SQ = 1 mm² (사용자 확인, 2026-09-07)",
     "total_rows": 46
   },
   "experiments": [
@@ -1029,6 +1031,77 @@
       "paper": "그래핀__전자파차폐.pdf",
       "synthesis": "CVD graphene 0.335nm",
       "key_finding": "투과율 91.5-97.2%, 2층그래핀 EMI흡수 발열 확인, SE=-10log|T|(dB)"
+    },
+    {
+      "paper": "Huang et al., \"The Efficiency Study of Graphene Synthesis on Copper Substrate via CVD with Methanol Precursor\", Nanomaterials 13, 1136 (2023)",
+      "category": "coverage/raman",
+      "synthesis_condition": "Low-pressure CVD, methanol carbon source, Ar 20sccm+H2 15sccm, 30min, growth temp 500/700/800/850/900/950C, Cu foil 25um",
+      "key_measurement": "700C: I2D/IG=0.33, 2D-FWHM=66cm-1, ID/IG=1.07(결함 동반). 800C: I2D/IG=0.80. 850C: I2D/IG=0.74. 900C: I2D/IG=1.60, FWHM=30cm-1(최적). 950C: I2D/IG=1.34, FWHM=36cm-1. 500C는 그래핀 미합성. 900C 이상에서 결함(D밴드)이 거의 관찰되지 않음",
+      "coverage_pct": null,
+      "note": "정량 커버리지(%) 수치는 본문에 직접 제시되지 않음(OM 사진 기반 정성적 묘사만 존재). 온도증가에 따른 I2D/IG, ID/IG, 2D-FWHM 값은 GAIQ가 확보한 CVD온도범위(1000C 중심)를 저온 구간(500-950C)으로 확장하는 벤치마크 데이터로 유용",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10059143/"
+    },
+    {
+      "paper": "Zhang et al., \"Growth of Large-Area High-Quality Graphene on Different Types of Copper Foils\", ACS Omega 4(3) (2019)",
+      "category": "coverage",
+      "synthesis_condition": "CVD, Cu foil preannealed under positive-pressure H2 atmosphere",
+      "key_measurement": "단일층(monolayer) 그래핀 커버리지 >95.00% 달성 (SEM/Raman 기반 매핑으로 확인)",
+      "coverage_pct": 95.0,
+      "note": "상용 CVD 그래핀/Cu 파운드리(Graphenea 등) 제품 데이터시트에도 'Coverage >95%'가 업계 표준 사양값으로 기재됨을 확인 (Graphenea Monolayer Graphene on Cu 4inch datasheet). GAIQ 노트북LM이 참조한 '커버리지≥90/95%' 기준이 산업계에서 달성가능한 일반적 수준임을 입증하는 교차근거",
+      "source_url": "https://pubs.acs.org/doi/10.1021/acsomega.8b02538"
+    },
+    {
+      "paper": "Kondrashov et al., \"Preparation of Copper Surface for the Synthesis of Single-Layer Graphene\", MDPI C(Nanomaterials) 2021 (PMC8143535)",
+      "category": "coverage/uniformity",
+      "synthesis_condition": "CVD, pressure 100mbar, H2:CH4=100:1, 1000C 20min. 전처리(전해연마ECP/화학에칭/어닐링)로 Cu포일 표면조도를 250nm에서 최소 80nm까지 감소",
+      "key_measurement": "추가(다층) 그래핀 섬(island) 비율: 표준 미처리 포일 사용시 9%, ECP로 표면조도 최소화 후 2.1%로 감소 (즉 단일층 커버리지가 약 91%에서 약 97.9%로 개선되는 것으로 환산 가능)",
+      "coverage_pct": "91~97.9 (단일층 기준, 다층섬 비율로부터 환산한 근사값)",
+      "note": "구리 기판 표면조도가 커버리지/다층화의 핵심 변수임을 정량 수치로 제시. GAIQ Cu 신재(연선/부스바)의 표면 전처리 공정이 커버리지 개선에 기여할 가능성을 시사하는 참고자료",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8143535/"
+    },
+    {
+      "paper": "Cimino et al., \"Industrial Graphene Coating of Low-Voltage Copper Wires for Power Distribution\", ACS Appl. Electron. Mater. (2023, PMC10391742)",
+      "category": "IR/thermal/coverage(wire)",
+      "synthesis_condition": "R2R 호환 상압(ambient pressure) CVD, 900-1000C, Ar 750-800mbar. 어닐링(Ar 2000sccm, 980C, 10min) -> 성장(CH4 2sccm 5초, H2 20sccm+Ar 2000sccm, 980C). Cu와이어 직경 1.37/1.74mm (저전압 LV용)",
+      "key_measurement": "전기전도율 향상: 코팅 직후 +1%, 24개월 후 +3% (Bare 대비 그래핀코팅 와이어가 산화/시간경과에 더 안정적). Raman I2D/IG을 이용해 커버리지/층수를 1um step 공간 매핑으로 분석",
+      "coverage_pct": null,
+      "note": "GAIQ의 CVD온도(1000C 중심) 및 연선(Cu wire) 형태와 거의 일치하는 산업생산적합(R2R 호환) 사례. 전도율 개선폭(1~3%)은 GAIQ 실측(11~22.7%)보다 작았으나, 장기 안정성(24개월) 데이터는 참고가치 있음",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10391742/"
+    },
+    {
+      "paper": "Kashani et al., \"An Axially Continuous Graphene-Copper Wire for High-Power Transmission: Thermoelectrical Characterization and Mechanisms\", Advanced Materials 33, 2104208 (2021)",
+      "category": "IR/ampacity/temperature-rise",
+      "synthesis_condition": "CVD로 Cu와이어(직경 10-80um) 표면에 축방향 연속 그래핀막(ACGC, axially continuous graphene-copper) 합성",
+      "key_measurement": "전류밀도 파괴한계(breakdown current density) +450% 향상, 허용전류(current) +41% 개선, 열방산(thermal dissipation) +224% 증가 (순수 Cu 대비)",
+      "temp_rise_ampacity_note": "전류 증가시 그래핀코팅이 표면 열방출을 도와 동일 전류에서 온도상승이 낮아짐 -> GAIQ의 IR카메라 실험(2024-7-30 보고서)이 보완하려는 기준과 유사한 사례. 다만 절대 단위(℃/A) 관계는 이 논문 요약에 직접 발췌되지 않음, 원문 확인시 세부 수치 추가 필요",
+      "source_url": "https://pubmed.ncbi.nlm.nih.gov/34677890/ ; https://advanced.onlinelibrary.wiley.com/doi/10.1002/adma.202104208"
+    },
+    {
+      "paper": "Pan et al. (Iowa State Univ., Cui group), \"Enhanced electrical conductivity in graphene-copper multilayer composite\", AIP Advances 12, 015310 (2022)",
+      "category": "conductivity/%IACS/raman",
+      "synthesis_condition": "PECVD(650C, RF 13.56MHz 50W, CH4 1sccm+H2(15%in Ar) 10sccm, 10min, 50mPa) + e-beam Cu증착 교대적층 (Cu포일 23.6um 기판 위 그래핀 6층+Cu 6층, 총 1.3um, 그래핀 부피비 0.008%)",
+      "key_measurement": "실온 전도율 104.2% IACS (Cu기판 포함, 순수 Cu 대비 +4.5%). Cu기판 두께를 제외하고 계산시(병렬저항모델) 185% IACS. 구리층 100nm까지 박막화시 이론상 256% IACS까지 가능. Raman G/2D peak 강도비로 단일층 확인(I(G)/I(2D)~0.5), D밴드는 백그라운드 수준(결함 매우 적음)",
+      "coverage_pct": null,
+      "note": "GAIQ 사업계획서 및 제일테크노스 목표치의 도전율(102~103%IACS) 단위를 뛰어넘는 이론적 상한 범위(104~185%, 잠재 256%)를 제시하는 벤치마크 데이터. row42(N-doped 복합재)와 함께 GAIQ ML 모델의 물리적 상한 벤치마크로 유용",
+      "source_url": "https://pubs.aip.org/aip/adv/article/12/1/015310/2819395/Enhanced-electrical-conductivity-in-graphene"
+    },
+    {
+      "paper": "Kang et al. (avadaingraphene.com 2차 인용 기사 경유, 원문 서지 미확인 - 교차검증 필요)",
+      "category": "ampacity/thermal(원문 확인 필요)",
+      "synthesis_condition": "그래핀-구리 복합재 (전기전송용 목적, 상세 공정변수 미기재)",
+      "key_measurement": "전류 담지능력(current carrying capacity) +450%, 전류(current) +41%, 열방산 +224% (Cu대비) - Kashani(2021)의 수치와 동일하여 동일 연구를 재인용한 것으로 추정됨(수치 일치)",
+      "coverage_pct": null,
+      "note": "2차 자료(산업 블로그/보고서)이므로 Kashani 2021 원문과 중복 가능성 높음 - 추가 인용시 원 논문(Kashani, Advanced Materials 2021)을 1차 출처로 표기 권장",
+      "source_url": "https://avadaingraphene.com/why-graphene-should-replace-copper-in-electrical-transmission-applications/"
+    },
+    {
+      "paper": "다수 CVD 그래핀 논문 종합 (Huang 2023, Nguyen 2013 등) - 라만 D/G 범용 기준값",
+      "category": "raman D/G general reference",
+      "synthesis_condition": "다수 CVD 연구(1000C 수준, CH4/H2 가스 사용)의 일반적 경향 종합",
+      "key_measurement": "1000C 기준 CVD에서 ID/IG < 0.1~0.3, I2D/IG > 1.5가 고품질 단일층 그래핀의 일반적 기준값(다수 문헌 종합). 저온(700-850C)에서는 ID/IG가 1 이상으로 결함 증가하는 경향 확인",
+      "coverage_pct": null,
+      "note": "GAIQ [제일테크노스]D/G≤0.1(2단계) 및 [창업중심대학 실측]D/G≤0.1 달성값이 고온 CVD(1000C)의 문헌상 상한과 일치함을 확인하는 교차 증거",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10059143/ (관련 상세 수치는 상단 Huang 항목 참조)"
     }
   ]
 }
