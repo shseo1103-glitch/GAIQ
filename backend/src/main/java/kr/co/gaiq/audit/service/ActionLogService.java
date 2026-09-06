@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.ZoneOffset;
 import kr.co.gaiq.audit.dto.ActionLogDto;
 import kr.co.gaiq.audit.repository.ActionLogRepository;
+import kr.co.gaiq.audit.repository.ActionLogSpecifications;
 import kr.co.gaiq.common.dto.PageResponse;
 import kr.co.gaiq.common.exception.EntityNotFoundException;
 import org.springframework.data.domain.Pageable;
@@ -30,7 +31,8 @@ public class ActionLogService {
         Instant startInstant = startDate != null ? startDate.atStartOfDay(ZoneOffset.UTC).toInstant() : null;
         Instant endInstant = endDate != null ? endDate.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant() : null;
         return PageResponse.of(
-                actionLogRepository.search(module, actorUserId, startInstant, endInstant, pageable),
+                actionLogRepository.findAll(
+                        ActionLogSpecifications.search(module, actorUserId, startInstant, endInstant), pageable),
                 ActionLogDto::from);
     }
 

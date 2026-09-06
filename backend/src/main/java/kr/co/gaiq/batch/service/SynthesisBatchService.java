@@ -16,6 +16,7 @@ import kr.co.gaiq.batch.dto.SynthesisProcessParamDto;
 import kr.co.gaiq.batch.entity.SynthesisBatch;
 import kr.co.gaiq.batch.entity.SynthesisProcessParam;
 import kr.co.gaiq.batch.repository.SynthesisBatchRepository;
+import kr.co.gaiq.batch.repository.SynthesisBatchSpecifications;
 import kr.co.gaiq.batch.repository.SynthesisProcessParamRepository;
 import kr.co.gaiq.common.dto.PageResponse;
 import kr.co.gaiq.common.exception.BusinessRuleViolationException;
@@ -56,8 +57,9 @@ public class SynthesisBatchService {
         Long effectiveOrgId = resolveOrgIdFilter(principal, orgIdParam);
         Instant startInstant = startDate != null ? startDate.atStartOfDay(ZoneOffset.UTC).toInstant() : null;
         Instant endInstant = endDate != null ? endDate.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant() : null;
-        Page<SynthesisBatch> page = synthesisBatchRepository.search(
-                effectiveOrgId, batchNo, status, startInstant, endInstant, pageable);
+        Page<SynthesisBatch> page = synthesisBatchRepository.findAll(
+                SynthesisBatchSpecifications.search(effectiveOrgId, batchNo, status, startInstant, endInstant),
+                pageable);
         return PageResponse.of(page, SynthesisBatchDto::from);
     }
 

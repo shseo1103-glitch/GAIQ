@@ -1,0 +1,70 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #app {
+  height: 100%;
+}
+
+body {
+  @apply bg-surface-light text-slate-800 dark:bg-elevation-0 dark:text-slate-100;
+  min-width: 1280px;
+}
+
+/* Elevation surfaces for cards/modals in dark mode (MD3 tonal elevation) */
+.surface-card {
+  @apply bg-white border border-slate-200 dark:bg-elevation-1 dark:border-slate-700/60;
+}
+.surface-card-2 {
+  @apply bg-white border border-slate-200 dark:bg-elevation-2 dark:border-slate-700/60;
+}
+.surface-modal {
+  @apply bg-white border border-slate-200 dark:bg-elevation-3 dark:border-slate-700/60;
+}
+.surface-topbar {
+  @apply bg-white border-b border-slate-200 dark:bg-elevation-2 dark:border-slate-700/60;
+}
+.surface-sidebar {
+  @apply bg-slate-50 border-r border-slate-200 dark:bg-elevation-1 dark:border-slate-700/60;
+}
+
+/* status badge base styles - color desaturated slightly in dark mode via CSS vars */
+.badge {
+  @apply inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold;
+}
+.badge-pass {
+  @apply bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300;
+}
+.badge-fail {
+  @apply bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300;
+}
+.badge-warn {
+  @apply bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300;
+}
+.badge-info {
+  @apply bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300;
+}
+.badge-neutral {
+  @apply bg-slate-100 text-slate-700 dark:bg-slate-700/50 dark:text-slate-300;
+}
+
+.btn {
+  @apply inline-flex items-center justify-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+}
+.btn-primary {
+  @apply bg-cyan-600 text-white hover:bg-cyan-700 dark:bg-cyan-600 dark:hover:bg-cyan-500;
+}
+.btn-secondary {
+  @apply bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-elevation-3 dark:text-slate-200 dark:hover:bg-elevation-4;
+}
+.btn-danger {
+  @apply bg-red-600 text-white hover:bg-red-700;
+}
+
+.input {
+  @apply w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 dark:border-slate-600 dark:bg-elevation-2 dark:text-slate-100;
+}
+
+.label {
+  @apply mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400;
+}
