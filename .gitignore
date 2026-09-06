@@ -1,0 +1,12 @@
+node_modules/
+build/
+target/
+*.class
+.gradle/
+dist/
+.env
+logs/
+*.log
+__pycache__/
+*.pyc
+.venv/
