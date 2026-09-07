@@ -1,0 +1,48 @@
+{
+  "SURFACE_TEMP_C": {
+    "features": [
+      "current_A",
+      "busbar_sq"
+    ],
+    "count": 9,
+    "sufficient": true,
+    "csv_path": "/home/work/.openclaw/workspace/gaiq/ml/data/processed/SURFACE_TEMP_C.csv",
+    "row_ids": [
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28
+    ],
+    "note": "부스바 80SQ(row20-25) + 20SQ(row26-28) 결합, current_A+busbar_sq 2피처"
+  },
+  "RAMAN_ID_IG": {
+    "features": [
+      "temperature_C",
+      "growth_time_min"
+    ],
+    "count": 0,
+    "sufficient": false,
+    "csv_path": "/home/work/.openclaw/workspace/gaiq/ml/data/processed/RAMAN_ID_IG.csv",
+    "row_ids": [],
+    "note": "온도/시간 매칭 row만 채택, 부등호(<=) 표기 값은 제외"
+  },
+  "RAMAN_I2D_IG": {
+    "features": [
+      "temperature_C",
+      "growth_time_min"
+    ],
+    "count": 2,
+    "sufficient": false,
+    "csv_path": "/home/work/.openclaw/workspace/gaiq/ml/data/processed/RAMAN_I2D_IG.csv",
+    "row_ids": [
+      5,
+      6
+    ],
+    "note": "온도/시간 매칭 row만 채택, 부등호(<=) 표기 값은 제외"
+  }
+}

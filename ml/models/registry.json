@@ -1,0 +1,92 @@
+{
+  "SURFACE_TEMP_C": [
+    {
+      "target_metric_code": "SURFACE_TEMP_C",
+      "algorithm": "GPR",
+      "version_no": "v1",
+      "trained_at": "2026-09-07T00:22:26.715005+00:00",
+      "training_data_count": 9,
+      "r2_score": 0.9899,
+      "mae": 0.7831,
+      "rmse": 1.0011,
+      "kernel_type": "Matern(nu=1.5)+WhiteKernel, fitted_kernel=1.71**2 * Matern(length_scale=[2.73, 6.36], nu=1.5) + WhiteKernel(noise_level=0.00152)",
+      "model_file_path": "/home/work/.openclaw/workspace/gaiq/ml/models/SURFACE_TEMP_C_GPR_v1.pkl",
+      "is_active": true,
+      "hyperparameters_json": {
+        "n_restarts_optimizer": 8,
+        "normalize_y": true,
+        "fitted_kernel_params": "{'k1': 1.71**2 * Matern(length_scale=[2.73, 6.36], nu=1.5), 'k2': WhiteKernel(noise_level=0.00152), 'k1__k1': 1.71**2, 'k1__k2': Matern(length_scale=[2.73, 6.36], nu=1.5), 'k1__k1__constant_value': np.float64(2.9084878539980537), 'k1__k1__constant_value_bounds': (0.001, 1000.0), 'k1__k2__length_scale': array([2.73033105, 6.36103004]), 'k1__k2__length_scale_bounds': (1e-05, 100000.0), 'k1__k2__nu': 1.5, 'k2__noise_level': np.float64(0.0015183171758785577), 'k2__noise_level_bounds': (1e-06, 10.0)}"
+      },
+      "features": [
+        "current_A",
+        "busbar_sq"
+      ]
+    },
+    {
+      "target_metric_code": "SURFACE_TEMP_C",
+      "algorithm": "RANDOM_FOREST",
+      "version_no": "v1",
+      "trained_at": "2026-09-07T00:22:28.089414+00:00",
+      "training_data_count": 9,
+      "r2_score": 0.8712,
+      "mae": 3.2826,
+      "rmse": 3.5734,
+      "kernel_type": null,
+      "model_file_path": "/home/work/.openclaw/workspace/gaiq/ml/models/SURFACE_TEMP_C_RANDOM_FOREST_v1.pkl",
+      "is_active": false,
+      "hyperparameters_json": {
+        "n_estimators": 200,
+        "max_depth": 4,
+        "min_samples_leaf": 1
+      },
+      "features": [
+        "current_A",
+        "busbar_sq"
+      ]
+    }
+  ],
+  "RAMAN_ID_IG": [
+    {
+      "target_metric_code": "RAMAN_ID_IG",
+      "algorithm": "RULE_BASED_FALLBACK",
+      "version_no": "v1",
+      "trained_at": "2026-09-07T00:22:28.090641+00:00",
+      "training_data_count": 0,
+      "r2_score": null,
+      "mae": null,
+      "rmse": null,
+      "kernel_type": null,
+      "model_file_path": "N/A_RULE_BASED_FALLBACK",
+      "is_active": true,
+      "hyperparameters_json": {
+        "reason": "training_data_count(0) < MIN_TRAINABLE(5)"
+      },
+      "features": [
+        "temperature_C",
+        "growth_time_min"
+      ]
+    }
+  ],
+  "RAMAN_I2D_IG": [
+    {
+      "target_metric_code": "RAMAN_I2D_IG",
+      "algorithm": "RULE_BASED_FALLBACK",
+      "version_no": "v1",
+      "trained_at": "2026-09-07T00:22:28.091212+00:00",
+      "training_data_count": 2,
+      "r2_score": null,
+      "mae": null,
+      "rmse": null,
+      "kernel_type": null,
+      "model_file_path": "N/A_RULE_BASED_FALLBACK",
+      "is_active": true,
+      "hyperparameters_json": {
+        "reason": "training_data_count(2) < MIN_TRAINABLE(5)"
+      },
+      "features": [
+        "temperature_C",
+        "growth_time_min"
+      ]
+    }
+  ]
+}

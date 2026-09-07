@@ -43,3 +43,10 @@ management:
     web:
       exposure:
         include: health,info
+
+# GAIQ ML 1단계 추론 서비스 (FastAPI, ml/service/main.py). 다운되었거나 해당 metric에
+# 모델이 없으면 MlPredictionService가 자동으로 threshold/최근실측 폴백으로 전환한다.
+gaiq:
+  ml:
+    service-url: ${GAIQ_ML_SERVICE_URL:http://localhost:8115}
+    timeout-ms: ${GAIQ_ML_TIMEOUT_MS:2000}
