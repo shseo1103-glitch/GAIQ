@@ -41,8 +41,14 @@ public class SecurityConfig {
             "/actuator/info"
     };
 
+    // 정확한 오리진 목망(localhost 등)과, 패턴 기반 오리진(임의 host + 포트 8114)을 분리 설정한다.
+    // 2026-09-07 수정: 사용자가 localhost가 아니림 공개IP/도음으로 접속하자 CORS가 버부되어(403) 로그인이 안 되는 문제가 발견되어,
+    // 특정 포트(8114)로 끈낞는 모닠 오리진을 허용하는 패턴을 추가함(대신 credential포함 요캭이 대상이버 패턴 도유자 대상에만 적용되는 점 유지).
     @Value("${gaiq.cors.allowed-origins:http://localhost:8114,http://127.0.0.1:8114}")
     private List<String> allowedOrigins;
+
+    @Value("${gaiq.cors.allowed-origin-patterns:http://*:8114,https://*:8114}")
+    private List<String> allowedOriginPatterns;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -53,6 +59,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(allowedOrigins);
+        configuration.setAllowedOriginPatterns(allowedOriginPatterns);
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

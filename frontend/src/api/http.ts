@@ -1,7 +1,11 @@
 import axios from 'axios'
 import router from '../router'
 
-const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8089/api/v1'
+// VITE_API_BASE_URL이 명시적으로 설정되지 않은 경우, 현재 브라우저가 접속한 hostname을 그대로 써서
+// 백엔드(8089)를 호출한다. localhost로 접속하든 VM의 공개 IP/도메인으로 접속하든 동일하게 동작하게 함.
+// (2026-09-07 수정: VITE_API_BASE_URL=http://localhost:8089 하드코딩으로 인해 외부(공개IP 등)에서
+//  접속 시 브라우저가 '자기 자신의 localhost:8089'를 호출하려다 실패하여 로그인이 안 되던 버그 수정)
+const baseURL = import.meta.env.VITE_API_BASE_URL || `http://${window.location.hostname}:8089/api/v1`
 
 const http = axios.create({
   baseURL,
