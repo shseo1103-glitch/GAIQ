@@ -400,6 +400,33 @@
 
 ---
 
+## 8. 통합 E2E 검증 결과 (2026-09-07)
+
+백엔드(8089)/프론트엔드(8114)/ML서비스(8115) 3개 서비스가 모두 기동 중인 상태에서 API 레벨 통합검증을 수행함(브라우저 UI 클릭 테스트는 SSRF 정책으로 불가 — Blocked 항목 참고).
+
+### 8.1 검증 항목 및 결과
+
+| 검증 항목 | 결과 |
+|---|---|
+| 로그인(JWT 발급) → /auth/me | ✅ 정상 |
+| /batches, /audit/action-logs, /organizations 등 주요 목록 조회 | ✅ 정상 (모두 200) |
+| 배치 상세/공정파라미터/QC측정/ML예측/진단 조회 | ✅ 정상 |
+| ML 예측(SURFACE_TEMP_C) 실제 GPR 모델 트리거 | ❌→✅ **버그 발견 및 수정** (아래 8.2) |
+
+### 8.2 발견 및 수정한 버그: ML GPR 모델이 API로 절대 트리거되지 않던 구조적 결함
+
+**증상**: `POST /batches/{id}/ml-predictions {"targetMetricCode":"SURFACE_TEMP_C"}` 호출 시 항상 `RULE_BASED_FALLBACK`으로만 응답하고, 실제 학습된 GPR 모델(R²=0.99)의 예측값이 절대 나오지 않음.
+
+**원인**: `ml/models/registry.json`의 SURFACE_TEMP_C GPR 모델은 `features=["current_A","busbar_sq"]`로 학습되었으나, 이 두 값을 API로 입력하는 유일한 경로인 `POST /batches/{id}/process-params`의 `paramName` 컬럼에는 DB CHECK 제약(`synthesis_process_param_param_name_check`, V1 마이그레이션)상 CVD 공정변수(CHAMBER_TEMP_C 등)만 허용되어 있었음 — `current_A`/`busbar_sq`를 저장할 방법이 전혀 없었음. 그 결과 `MlPredictionService.predict()`가 FastAPI에 보내는 `inputParams`에 해당 피처가 항상 빠져 있어 `MissingFeatures` 응답 → 폴백으로 귀결.
+
+**수정**: `V4__add_ml_feature_params.sql` 마이그레이션 추가 — CHECK 제약에 `current_A`, `busbar_sq`(ML서비스 피처명과 대소문자까지 정확히 일치) 추가, `docs/api-contract/01-gaiq-core.yaml`의 해당 enum도 동기화.
+
+**재검증**: `current_A=200, busbar_sq=80`으로 process-param 등록 후 ML예측 재호출 → `predictedValue=12.2658, predictedStdDev=0.4749, confidenceLevel=MEDIUM` (ML서비스(8115)에 동일 입력으로 직접 호출한 결과와 정확히 일치) 확인. 백엔드/ML 로그에서 폴백 경고가 더 이상 발생하지 않음을 확인.
+
+**교훈**: curl 레벨 검증에서 "200/201 응답"만 확인하고 응답 바디의 `confidenceLevel`/`algorithm`까지 대조하지 않았다면 이 결함을 놓칠 수 있었음 — 향후 통합검증 시 응답 코드뿐 아니라 실제 값의 의미(폴백 여부)까지 확인하는 것이 중요.
+
+---
+
 ## 부록: 생성 파일 목록
 
 - `/home/work/.openclaw/workspace/gaiq/data/experiment_dataset_raw.json` — 46 row 상세 실험데이터 + external_benchmark_papers_summary 20건 (2026-09-07 국내외 재검색 2건 + 사용자제공 논문8건 중 커버리지% 관련 3건 반영, IR관련4건/무관1건 제외, §6·§7 참고) (전체 구조 보존, SSOT/SQ정의 메타데이터 포함)

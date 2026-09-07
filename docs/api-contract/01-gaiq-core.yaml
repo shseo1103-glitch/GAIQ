@@ -1704,7 +1704,7 @@ components:
           format: int64
         paramName:
           type: string
-          enum: [CHAMBER_TEMP_C, CH4_FLOW_SCCM, H2_FLOW_SCCM, AR_FLOW_SCCM, CHAMBER_PRESSURE_PA, ANNEAL_TIME_MIN, GROWTH_TIME_MIN, ROLL_TENSION_KGM, WINDING_SPEED_MH, OTHER]
+          enum: [CHAMBER_TEMP_C, CH4_FLOW_SCCM, H2_FLOW_SCCM, AR_FLOW_SCCM, CHAMBER_PRESSURE_PA, ANNEAL_TIME_MIN, GROWTH_TIME_MIN, ROLL_TENSION_KGM, WINDING_SPEED_MH, current_A, busbar_sq, OTHER]
         paramValue:
           type: number
         unit:
@@ -1719,7 +1719,7 @@ components:
       properties:
         paramName:
           type: string
-          enum: [CHAMBER_TEMP_C, CH4_FLOW_SCCM, H2_FLOW_SCCM, AR_FLOW_SCCM, CHAMBER_PRESSURE_PA, ANNEAL_TIME_MIN, GROWTH_TIME_MIN, ROLL_TENSION_KGM, WINDING_SPEED_MH, OTHER]
+          enum: [CHAMBER_TEMP_C, CH4_FLOW_SCCM, H2_FLOW_SCCM, AR_FLOW_SCCM, CHAMBER_PRESSURE_PA, ANNEAL_TIME_MIN, GROWTH_TIME_MIN, ROLL_TENSION_KGM, WINDING_SPEED_MH, current_A, busbar_sq, OTHER]
         paramValue:
           type: number
         unit:
