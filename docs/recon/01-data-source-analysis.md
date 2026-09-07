@@ -370,6 +370,8 @@
 ## 7. 사용자 제공 논문 8건 검토 결과 (2026-09-07, 질문3·질문4 직접 답변자료)
 
 > 사용자가 질문3(커버리지% 근거자료)·질문4(IR카메라 원본 raw데이터) 답변으로 논문 8건을 직접 제공. 전건 원문(PDF) 직접 확인 완료.
+>
+> **[2026-09-07 사용자 결정] IR 이미지 관련 논문 4건(Nakajima/Kang/Choi/Kim2015)과 shih2010(그래핀과 무관)은 데이터셋에서 제외하기로 결정.** IR 온도상승 데이터 자체를 GAIQ ML 파이프라인에서 사용하지 않기로 함에 따라 질문4 관련 자료는 전량 제외. 아래 §7.1 평가표는 검토 기록 보존 목적으로만 유지하며, `external_benchmark_papers_summary`에는 커버리지%(질문3) 관련 3건만 반영됨(20건).
 
 ### 7.1 종합 평가표
 
@@ -378,28 +380,28 @@
 | **Li et al., Nano Lett. 2010** (`li2010.pdf`) | ⭐⭐⭐ 매우 높음 | 커버리지 90%(부분정체)/100%(완전) 실측 - CVD 가스조건 임계값에 따른 커버리지 결정 메커니즘 실증 |
 | **Celebi et al., Nano Lett. 2013** (`celebi2013.pdf`) | ⭐⭐⭐ 매우 높음 | 커버리지 98.4% 이상 + I(D)/I(G)=0.09±0.02 실측 - GAIQ D/G≤0.1 목표치와 거의 일치하는 교차검증 |
 | **Ambrosi et al., Nanoscale 2013** (`ambrosi2013.pdf`) | ⭐⭐⭐ 매우 높음 | Cu foil CVD 그래핀 커버리지 97.7~99.97% 실측(전기화학적 정량법) - GAIQ 90/95% 목표가 산업표준 수준임을 뒷받침 |
-| **Nakajima et al., Sci. Adv. 2019** (`sciadv.aau3407.pdf`) | ⭐⭐⭐ 매우 높음(질문4) | Lock-in Thermography로 IR열화상-라만D/G-전기저항의 물리적 상관관계 실증 - GAIQ가 IR온도와 라만D/G를 함께 쓰는 것의 이론적 근거 |
-| **Kang et al., Nano Lett. 2011** (`kang2011.pdf`) | ⭐⭐ 중간 | 그래핀 발열체 IR열화상 실측(12V/100℃, 30V/55℃) - 형태(필름 vs 전선)가 달라 직접비교엔 한계 |
-| **Kim et al., ACS Nano 2015** (`kim2015.pdf`) | ⭐⭐ 중간 | IR카메라 73.4℃ 실측 + "카메라 해상도 한계로 실제 핫스팟은 180℃ 이상일 것" 이라는 중요한 방법론적 유의사항 |
-| **Choi et al., Adv. Funct. Mater. 2015** (`Choi_et_al-2015...pdf`) | ⭐ 낮음 | IR카메라 촬영은 했으나 정량 온도수치가 본문에 없어(그래프만) 활용도 낮음 |
-| **Shih & Chui, ECS Trans. 2010** (`shih2010.pdf`) | ❌ 무관 | 그래핀과 무관한 반도체 트랜지스터(InGaAs PBT) 시뮬레이션 논문 - 오첨부로 판단 |
+| **Nakajima et al., Sci. Adv. 2019** (`sciadv.aau3407.pdf`) | 🚫 제외(사용자결정) | Lock-in Thermography로 IR열화상 관련 - IR 데이터 자체를 미사용하기로 결정하여 데이터셋에서 제외 |
+| **Kang et al., Nano Lett. 2011** (`kang2011.pdf`) | 🚫 제외(사용자결정) | 그래핀 발열체 IR열화상 실측 - IR 데이터 미사용 결정으로 제외 |
+| **Kim et al., ACS Nano 2015** (`kim2015.pdf`) | 🚫 제외(사용자결정) | IR카메라 실측 - IR 데이터 미사용 결정으로 제외 |
+| **Choi et al., Adv. Funct. Mater. 2015** (`Choi_et_al-2015...pdf`) | 🚫 제외(사용자결정) | IR카메라 촬영 관련 - IR 데이터 미사용 결정으로 제외 |
+| **Shih & Chui, ECS Trans. 2010** (`shih2010.pdf`) | ❌ 제외(무관) | 그래핀과 무관한 반도체 트랜지스터(InGaAs PBT) 시뮬레이션 논문 - 오첨부로 판단, 사용자 확인 후 제외 |
 
 ### 7.2 질문3(커버리지% 근거자료) 답변
 
 **결론: 명확한 학술적 근거 확보됨.** Li(2010)/Celebi(2013)/Ambrosi(2013) 3개 논문이 CVD 그래핀 커버리지 90~99.97%를 실측치로 제시하며, 커버리지가 (1) CVD 가스 유량/분압의 임계값 여부, (2) 성장시간, (3) 측정방법(광학현미경 vs 전기화학적 정량)에 따라 결정됨을 실증. 이는 노트북LM이 제시한 "커버리지 90/95%" 목표치가 **산업계/학계에서 실제로 달성 가능한 정상적인 CVD 공정 목표**임을 뒷받침하는 1차 학술 근거로 충분함. 다만 이 논문들은 **GAIQ 자체 실험의 실측 커버리지% 데이터를 대체하지는 않음** — GAIQ 47개 파일에 커버리지% 실측치가 없다는 사실은 변하지 않으며, 이 논문들은 "목표치의 타당성"을 뒷받침하는 참고자료로 활용.
 
-### 7.3 질문4(IR카메라 원본 raw데이터) 답변
+### 7.3 질문4(IR카메라 원본 raw데이터) 답변 — [2026-09-07] 사용자 결정: IR 데이터 미사용
 
-**결론: 원본 데이터 대체는 불가하나 방법론적 근거는 크게 보강됨.** Nakajima(2019)의 Lock-in Thermography 연구는 IR열화상에서 관측되는 국부 발열이 도메인경계(DB)·크랙·주름 등의 결함과 라만 D/G 비율에 정비례함을 실증하여, GAIQ가 IR온도상승과 라만 D/G를 함께 품질지표로 사용하는 접근의 물리적 타당성을 뒷받침. Kim(2015)은 IR카메라의 공간해상도 한계로 실제 핫스팟 온도가 과소평가될 수 있음을 경고하여 GAIQ IR측정 결과 해석 시 유의점을 제공. 그러나 이들 논문 어디에도 **GAIQ 2024-7-30 보고서의 원본 IR 이미지나 raw 데이터 자체를 대체할 수 있는 자료는 없음** — 이는 외부 문헌으로 해결 불가능한, GAIQ 고유 실험 데이터의 문제로 재확인됨.
+사용자가 IR 이미지/열화상 데이터를 GAIQ ML 파이프라인 및 데이터셋에서 **제외하기로 결정**함. 관련 논문 4건(Nakajima 2019, Kang 2011, Choi 2015, Kim 2015)은 검토는 완료했으나 `external_benchmark_papers_summary`에 반영하지 않음(§7.1 평가표에는 검토 기록만 보존). 이에 따라 SURFACE_TEMP_C 등 ML 예측 대상에서 IR 열화상 기반 파생 피처를 사용하지 않으며, 향후 IR 관련 원본 raw데이터 확보 요구도 해소됨(불필요).
 
 ### 7.4 데이터셋 반영
 
-위 8건 중 활용 가능한 6건(무관 1건, 낮은활용도 1건 제외)을 `data/experiment_dataset_raw.json`의 `external_benchmark_papers_summary`에 상세 수치와 함께 추가 완료(17건→25건). SSOT 문서(§4의 D/G≤0.1, 커버리지≥90/95%)와의 교차검증 결과, Celebi(2013)의 실측 D/G=0.09±0.02는 GAIQ 목표치와 거의 정확히 일치하여 SSOT 목표설정의 타당성을 강하게 뒷받침함.
+8건 중 커버리지%(질문3) 관련 3건(Li 2010, Celebi 2013, Ambrosi 2013)만 `data/experiment_dataset_raw.json`의 `external_benchmark_papers_summary`에 최종 반영(17건→20건). IR 관련 4건 및 무관 1건(shih2010)은 사용자 결정에 따라 제외. SSOT 문서(§4의 D/G≤0.1, 커버리지≥90/95%)와의 교차검증 결과, Celebi(2013)의 실측 D/G=0.09±0.02는 GAIQ 목표치와 거의 정확히 일치하여 SSOT 목표설정의 타당성을 강하게 뒷받침함.
 
 ---
 
 ## 부록: 생성 파일 목록
 
-- `/home/work/.openclaw/workspace/gaiq/data/experiment_dataset_raw.json` — 46 row 상세 실험데이터 + external_benchmark_papers_summary 25건 (2026-09-07 국내외 재검색 2건 + 사용자제공 논문8건 검토 6건 추가, §6·§7 참고) (전체 구조 보존, SSOT/SQ정의 메타데이터 포함)
+- `/home/work/.openclaw/workspace/gaiq/data/experiment_dataset_raw.json` — 46 row 상세 실험데이터 + external_benchmark_papers_summary 20건 (2026-09-07 국내외 재검색 2건 + 사용자제공 논문8건 중 커버리지% 관련 3건 반영, IR관련4건/무관1건 제외, §6·§7 참고) (전체 구조 보존, SSOT/SQ정의 메타데이터 포함)
 - `/home/work/.openclaw/workspace/gaiq/data/experiment_dataset_raw.csv` — 46 row × 180컬럼 정규화 버전 (JSON 기준 재생성, ML 학습용)
 - `/home/work/.openclaw/workspace/gaiq/docs/recon/01-data-source-analysis.md` — 본 보고서 (2026-09-07 2차 업데이트: SSOT 재확인, 논문보강, SQ정의, ML방법론 최종권장안 추가)
