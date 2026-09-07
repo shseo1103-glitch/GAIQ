@@ -1102,6 +1102,24 @@
       "coverage_pct": null,
       "note": "GAIQ [제일테크노스]D/G≤0.1(2단계) 및 [창업중심대학 실측]D/G≤0.1 달성값이 고온 CVD(1000C)의 문헌상 상한과 일치함을 확인하는 교차 증거",
       "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10059143/ (관련 상세 수치는 상단 Huang 항목 참조)"
+    },
+    {
+      "paper": "Liu, Han, Zhang, Zhang, Ding, 'Advancing Copper Wire Technology: Graphene/Cu Composites for Superior Conductivity and Strength', Applied Sciences 14(20), 9273 (2024)",
+      "category": "conductivity/tensile strength/synthesis condition (신규 확보, 2026-09-07 국내외 논문 재검색)",
+      "synthesis_condition": "CVD로 제조된 Gr/Cu 복합분말(그래핀 함량 0.01~0.05wt%, Cu순도>99.9%)을 분말야금 공정으로 와이어화: 900C 아르곤분위기 열간압착(6h, 40MPa) -> 800C Ar+H2 분위기 어닐링(5h) -> 신선가공(직경 2.0mm까지) -> 최종 어닐링",
+      "key_measurement": "어닐링된 Gr/Cu 복합와이어: 전기전도도 101.0%±0.4% IACS (순수구리 92.6%±0.4% 대비 향상), 인장강도 238.3~247.1MPa (순수구리 201.2MPa 대비 +18.4~22.9%). 결정립 크기: 순수구리 4.2um -> 복합재 2.5~3.2um로 미세화(그래핀이 결정립 성장 억제)",
+      "coverage_pct": null,
+      "note": "중국 국가전망(State Grid) 산하 연구소(China Electric Power Research Institute) 논문. GAIQ의 CVD+분말야금 공정 조합과 유사하며, 전도도(101%IACS)는 GAIQ [제일테크노스]1단계 목표(102%IACS)에 근접. 인장강도 수치는 GAIQ 47개 파일에 없던 신규 정량 벤치마크(SSOT 문서에는 인장강도 데이터 자체가 없었음)",
+      "source_url": "https://doi.org/10.3390/app14209273"
+    },
+    {
+      "paper": "Kim, Shin, Choi, Rho, Park, Moon, Kim, Lee, Lee, Kim, Lee, Kim, Hong, Bae, 'Ultrastrong Graphene-Copper Core-Shell Wires for High-Performance Electrical Cables', ACS Nano 12(3), 2803-2808 (2018)",
+      "category": "ampacity/mechanical (국내 KIST-서울대 공동연구, 원문 abstract 재검증)",
+      "synthesis_condition": "그래핀 섬유(GF)를 CVD로 먼저 합성한 뒤 전기도금으로 구리 쉘을 형성하는 core-shell 구조(공정온도/가스 상세는 원문 본문 참조 필요, abstract에는 미기재)",
+      "key_measurement": "그래핀 섬유의 넓은 표면적이 Cu와 접촉해 core-shell 와이어의 기계적 강도를 극대화. 그래핀의 고유한 전기/열 특성으로 순수 구리 대비 약 10배 높은 전류밀도 한계(ampacity) 확보. 국내 보도자료(철강금속신문 등)에 따르면 기계적 강도 2배 이상, 최대허용전류 10배 이상",
+      "coverage_pct": null,
+      "note": "저자: KIST 배수강 박사팀 + 서울대 홍병희 교수팀 + 그래핀스퀘어(주) 공동연구. 본 논문의 Supporting Information 원본(nn8b00043_si_001.pdf)이 사용자가 첨부한 47개 파일에 이미 포함되어 있었으며(row 40-41 인근), 이전 서브에이전트가 이미 experiment_dataset_raw.csv에 인장강도 670-1210MPa/전도도 2.8-4.0x10^7 S/m로 반영 완료함을 원문 abstract 대조로 재확인(2026-09-07). GAIQ 데이터의 ampacity(전류용량) 관련 유일한 10배 수준 벤치마크 - SURFACE_TEMP_C ML모델의 물리적 타당성을 뒷받침하는 근거자료로 유용",
+      "source_url": "https://doi.org/10.1021/acsnano.8b00043 ; https://pubmed.ncbi.nlm.nih.gov/29510020/"
     }
   ]
 }
