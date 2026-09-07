@@ -36,9 +36,22 @@ gaiq/
 ## 진행 상태
 
 - [x] 요구사항 결정 완료 (2026-09-07)
-- [ ] 원본 데이터 분석 (진행 중)
-- [ ] ERD/화면명세 설계
-- [ ] 백엔드 구현
-- [ ] ML 모델 학습
-- [ ] 프론트엔드 구현
-- [ ] 배포
+- [x] 원본 데이터 분석 (`docs/recon/01-data-source-analysis.md`)
+- [x] ERD/화면명세/API계약 설계 (`docs/design/`, `docs/api-contract/`)
+- [x] 백엔드 구현 (Spring Boot, 46개 엔드포인트, JWT 인증, 멀티테넌트)
+- [x] ML 모델 학습 (GPR 주모델 + RandomForest 보조검증, SURFACE_TEMP_C 실제학습완료)
+- [x] 프론트엔드 구현 (Vue3, SCR-01~10 전체 10개 화면, 다크모드)
+- [x] 통합 E2E 검증 (2026-09-07) — ML GPR모델 API미트리거 버그 발견/수정(V4 마이그레이션)
+- [x] pm2 배포 (2026-09-07)
+
+## 배포 현황 (2026-09-07)
+
+| 서비스 | pm2 프로세스명 | 포트 | 실행 커맨드 |
+|---|---|---|---|
+| 백엔드 | `gaiq-backend` | 8089 | `java -jar build/libs/gaiq-backend.jar --server.port=8089` |
+| 프론트엔드 | `gaiq-frontend` | 8114 | `npx vite --port 8114 --host` |
+| ML 추론서비스 | `gaiq-ml` | 8115 | `.venv/bin/uvicorn service.main:app --host 0.0.0.0 --port 8115` (`--interpreter none` 필수) |
+
+- DB: PostgreSQL `gaiq`(계정 gaiq/gaiq), localhost:5432
+- 테스트 계정: orgCode=`GEL001`, loginId=`admin`, password=`admin1234`, role=PLATFORM_ADMIN
+- `pm2 save` 완료. 단, systemd startup 서비스는 미등록 상태(이 VM의 다른 프로젝트들과 동일한 관례) — 서버 재부팅 시 `pm2 resurrect` 또는 수동 재기동 필요할 수 있음.
